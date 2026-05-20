@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-title" content="釜山之旅">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/480/south-korea.png">
+    <title>2026 韓國釜山</title>
+
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F2F2F7; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior-y: none; }
+
+        .glass-nav { background: rgba(255,255,255,0.98); border-bottom: 1px solid rgba(0,0,0,0.05); padding-top: calc(env(safe-area-inset-top) + 20px); padding-bottom: 10px; position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+        main { padding-top: calc(env(safe-area-inset-top) + 180px); padding-bottom: 100px; min-height: 100vh; }
+
+        .ios-card { background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; margin-bottom: 20px; transition: transform 0.2s; }
+        .ios-card:active { transform: scale(0.995); }
+
+        .swiper { width: 100%; height: auto; }
+        .swiper-slide { height: auto; }
+
+        .tab-btn { transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1); white-space: nowrap; border-radius: 9999px; padding: 8px 16px; font-size: 13px; font-weight: bold; scroll-snap-align: center; }
+        .tab-active { background-color: #3B82F6; color: white; transform: scale(1.05); box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
+        .tab-inactive { background-color: white; color: #8E8E93; border: 1px solid #F2F2F7; }
+
+        .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; }
+        .chat-user { background: #3B82F6; color: white; border-bottom-right-radius: 4px; align-self: flex-end; margin-left: auto; }
+        .chat-ai { background: #F3F4F6; color: #1F2937; border-bottom-left-radius: 4px; align-self: flex-start; margin-right: auto; }
+        .typing-dot { display: inline-block; width: 6px; height: 6px; background-color: #9CA3AF; border-radius: 50%; animation: typing 1.4s infinite; margin: 0 2px; }
+        @keyframes typing { 0%,80%,100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .timeline-line { position: absolute; left: 24px; top: 10px; bottom: -10px; width: 2px; background: #E5E5EA; z-index: 0; }
+        .expand-content { transition: all 0.3s ease-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .expanded { max-height: 2000px; opacity: 1; }
+        .check-circle { transition: all 0.2s; }
+        .checked-bg { background-color: #34C759; border-color: #34C759; }
+
+        @keyframes pulse-blue { 0%,100% { border-color: #60A5FA; box-shadow: 0 0 0 0 rgba(96,165,250,0.7); } 50% { border-color: #3B82F6; box-shadow: 0 0 0 4px rgba(96,165,250,0); } }
+        .active-event-card { border-left: 4px solid #3B82F6; animation: pulse-blue 2s infinite; background: #EFF6FF; }
+
+        @keyframes toast-in { from { opacity: 0; transform: translateY(-12px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
+        .toast-enter { animation: toast-in 0.25s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        .toast-leave { animation: toast-out 0.2s ease-in forwards; }
+
+        .money-bar-food { background: #FB923C; }
+        .money-bar-shop { background: #F472B6; }
+        .money-bar-traffic { background: #60A5FA; }
+        .money-bar-other { background: #94A3B8; }
+
+        @keyframes live-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+        .live-dot { animation: live-dot 1.5s ease-in-out infinite; }
+
+        [x-cloak] { display: none !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .money-item-card { background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.15s, box-shadow 0.15s; user-select: none; -webkit-user-select: none; }
+
+        .warn-card { background: #FFF7ED; border-left: 3px solid #F97316; }
+        .info-card { background: #EFF6FF; border-left: 3px solid #3B82F6; }
+        .pass-badge { background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
+        .warn-badge { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
+    </style>
+</head>
+<body class="text-slate-700" x-data="tripData()" x-init="initApp()">
+
+    <!-- Toast -->
+    <div x-show="showToast" x-cloak
+         :class="toastLeaving ? 'toast-leave' : 'toast-enter'"
+         class="fixed right-4 z-[9999] bg-black/75 text-white px-4 py-2.5 rounded-full text-xs font-bold backdrop-blur-md flex items-center gap-2"
+         style="top: calc(env(safe-area-inset-top) + 20px);">
+        <i class="ph-bold ph-check-circle text-green-400"></i>
+        <span x-text="toastText"></span>
+    </div>
+
+    <!-- AI 浮動按鈕 -->
+    <button @click="openChat()" class="fixed bottom-6 right-6 z-[5000] w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-white active:scale-90 transition-transform border-4 border-white/20">
+        <i class="ph-fill ph-robot text-2xl"></i>
+        <div x-show="!apiKey" class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-bounce"></div>
+    </button>
+
+    <!-- Chat Modal -->
+    <div x-show="showChatModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm" @click.self="showChatModal = false">
+        <div class="bg-white w-full h-[90vh] max-w-md rounded-3xl shadow-2xl relative flex flex-col overflow-hidden">
+            <div class="bg-slate-50 p-4 border-b border-slate-100 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="ph-fill ph-robot"></i></div>
+                    <div><h3 class="font-bold text-slate-800 text-sm">Busan Bot</h3><p class="text-[10px] text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span> Online • 支援圖片辨識 📷</p></div>
+                </div>
+                <div class="flex gap-2">
+                    <button @click="showKeySettings = !showKeySettings" class="p-2 text-slate-400 hover:text-slate-600 transition-colors"><i class="ph-bold ph-gear"></i></button>
+                    <button @click="clearChatHistory()" class="p-2 text-slate-400 hover:text-red-400 transition-colors"><i class="ph-bold ph-trash"></i></button>
+                    <button @click="showChatModal = false" class="p-2 text-slate-400"><i class="ph-bold ph-x"></i></button>
+                </div>
+            </div>
+
+            <div x-show="showKeySettings || !apiKey" class="bg-slate-100 p-4 border-b border-slate-200 overflow-y-auto" style="max-height:50vh">
+                <label class="text-xs font-bold text-slate-500 mb-1 block">Google Gemini API Key</label>
+                <input type="text" x-model="apiKeyTemp" placeholder="AIza..." class="w-full rounded-lg border border-slate-300 p-2 text-xs mb-3 bg-white outline-none">
+                <label class="text-xs font-bold text-slate-500 mb-1 block">模型選擇</label>
+                <div class="grid grid-cols-1 gap-1.5 mb-3">
+                    <button @click="modelIdTemp='gemini-2.5-flash'; saveSettings()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left" :class="modelId==='gemini-2.5-flash'?'border-indigo-400 bg-indigo-50':'border-slate-200 bg-white'">
+                        <span class="text-lg">⚡</span>
+                        <div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Flash <span class="text-[10px] text-indigo-500 font-bold ml-1">推薦</span></div><div class="text-[10px] text-slate-400">快速 • 圖片辨識 • 250次/天</div></div>
+                        <i x-show="modelId==='gemini-2.5-flash'" class="ph-fill ph-check-circle text-indigo-500"></i>
+                    </button>
+                    <button @click="modelIdTemp='gemini-2.5-pro'; saveSettings()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left" :class="modelId==='gemini-2.5-pro'?'border-indigo-400 bg-indigo-50':'border-slate-200 bg-white'">
+                        <span class="text-lg">🧠</span>
+                        <div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Pro</div><div class="text-[10px] text-slate-400">最強推理 • 100次/天</div></div>
+                        <i x-show="modelId==='gemini-2.5-pro'" class="ph-fill ph-check-circle text-indigo-500"></i>
+                    </button>
+                    <button @click="modelIdTemp='gemini-2.5-flash-lite'; saveSettings()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left" :class="modelId==='gemini-2.5-flash-lite'?'border-indigo-400 bg-indigo-50':'border-slate-200 bg-white'">
+                        <span class="text-lg">🪶</span>
+                        <div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Flash Lite</div><div class="text-[10px] text-slate-400">省額度 • 1000次/天</div></div>
+                        <i x-show="modelId==='gemini-2.5-flash-lite'" class="ph-fill ph-check-circle text-indigo-500"></i>
+                    </button>
+                </div>
+                <button @click="saveSettings()" class="bg-indigo-500 text-white text-xs font-bold px-3 py-3 rounded-lg w-full active:scale-95 transition-transform shadow-md">儲存設定</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 bg-white flex flex-col" id="chatContainer">
+                <div class="flex-1 space-y-4 min-h-[100px]">
+                    <div x-show="chatHistory.length===0" class="text-center text-slate-400 text-sm mt-6 space-y-3 px-4">
+                        <div class="text-4xl">🇰🇷</div>
+                        <div class="font-bold text-slate-600">嗨！我是 Busan Bot</div>
+                        <div class="text-xs leading-relaxed">問我行程、韓文翻譯、推薦美食…<br>或直接<b class="text-blue-600">拍照</b>讓我翻譯菜單告示！</div>
+                        <div class="flex justify-center gap-2 flex-wrap pt-1">
+                            <span class="text-[10px] bg-orange-100 text-orange-600 font-bold px-2.5 py-1 rounded-full">🍖 菜單翻譯</span>
+                            <span class="text-[10px] bg-sky-100 text-sky-600 font-bold px-2.5 py-1 rounded-full">🪧 告示辨識</span>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-600 font-bold px-2.5 py-1 rounded-full">💊 藥品辨識</span>
+                            <span class="text-[10px] bg-violet-100 text-violet-600 font-bold px-2.5 py-1 rounded-full">🗺️ 地圖導覽</span>
+                        </div>
+                    </div>
+                    <template x-for="(msg,idx) in chatHistory" :key="idx">
+                        <div class="flex flex-col w-full">
+                            <div class="text-[10px] text-slate-300 mb-1" :class="msg.role==='user'?'text-right':'text-left'" x-text="msg.time"></div>
+                            <div class="chat-bubble shadow-sm" :class="msg.role==='user'?'chat-user':'chat-ai'" x-html="msg.isHtml?msg.content:renderMarkdown(msg.content)"></div>
+                        </div>
+                    </template>
+                    <div x-show="isAiThinking" class="chat-bubble chat-ai w-16 flex items-center justify-center">
+                        <div class="typing-dot" style="animation-delay:0s"></div>
+                        <div class="typing-dot" style="animation-delay:0.2s"></div>
+                        <div class="typing-dot" style="animation-delay:0.4s"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速提問 -->
+            <div class="px-3 pt-2 flex gap-2 overflow-x-auto no-scrollbar">
+                <button @click="quickAsk('今天行程有什麼重點注意事項？')" class="flex-shrink-0 text-[10px] bg-blue-50 text-blue-600 font-bold px-3 py-1.5 rounded-full border border-blue-100 active:scale-95 transition-transform">📋 今日重點</button>
+                <button @click="quickAsk('附近有什麼推薦的韓國料理？')" class="flex-shrink-0 text-[10px] bg-orange-50 text-orange-600 font-bold px-3 py-1.5 rounded-full border border-orange-100 active:scale-95 transition-transform">🍖 附近美食</button>
+                <button @click="quickAsk('Kakao T 怎麼叫車？給我步驟')" class="flex-shrink-0 text-[10px] bg-yellow-50 text-yellow-600 font-bold px-3 py-1.5 rounded-full border border-yellow-100 active:scale-95 transition-transform">🚕 叫車教學</button>
+            </div>
+
+            <!-- 圖片預覽區 -->
+            <div x-show="pendingImage" class="px-3 pt-2">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3">
+                    <div class="flex gap-3 mb-3">
+                        <div class="relative flex-shrink-0">
+                            <img :src="pendingImage" class="h-20 w-20 rounded-xl object-cover border-2 border-blue-200 shadow-sm">
+                            <button @click="pendingImage=null;pendingImageMime=null;pendingImageBase64=null;chatInput=''" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full text-white flex items-center justify-center shadow active:scale-90 transition-transform"><i class="ph-bold ph-x text-[10px]"></i></button>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-center">
+                            <div class="text-xs font-bold text-blue-700 flex items-center gap-1 mb-1"><i class="ph-fill ph-check-circle text-green-500"></i> 圖片已選取</div>
+                            <div class="text-[10px] text-slate-500 mb-2">選擇場景快速發送，或自訂問題後按送出</div>
+                            <div class="flex gap-1.5">
+                                <button @click="document.getElementById('chatCameraCapture').click()" class="flex-1 text-[9px] bg-violet-100 text-violet-600 font-bold py-1.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-1"><i class="ph-bold ph-camera"></i> 重拍</button>
+                                <button @click="document.getElementById('chatImageUpload').click()" class="flex-1 text-[9px] bg-slate-100 text-slate-600 font-bold py-1.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-1"><i class="ph-bold ph-images"></i> 換圖</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button @click="chatInput='請完整翻譯菜單所有內容，以繁體中文標示，並推薦3道好吃的料理'; sendChat()" class="text-[11px] bg-orange-500 text-white font-bold px-2 py-2.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1 shadow-sm">🍖 菜單翻譯</button>
+                        <button @click="chatInput='請翻譯並解釋這個告示牌的意思，有什麼需要注意的嗎？'; sendChat()" class="text-[11px] bg-sky-500 text-white font-bold px-2 py-2.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1 shadow-sm">🪧 告示翻譯</button>
+                        <button @click="chatInput='幫我辨識這個韓國藥品包裝的內容，這是什麼藥？怎麼使用？'; sendChat()" class="text-[11px] bg-emerald-500 text-white font-bold px-2 py-2.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1 shadow-sm">💊 藥品辨識</button>
+                        <button @click="chatInput='請翻譯這張地圖的內容，告訴我怎麼走'; sendChat()" class="text-[11px] bg-teal-500 text-white font-bold px-2 py-2.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1 shadow-sm">🗺️ 地圖導覽</button>
+                        <button @click="chatInput='請辨識圖片中的商品名稱與價格'; sendChat()" class="text-[11px] bg-pink-500 text-white font-bold px-2 py-2.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1 shadow-sm">🏷️ 商品辨識</button>
+                        <button @click="chatInput=chatInput.trim()||'請辨識並翻譯這張圖片的所有文字內容'; sendChat()" class="text-[11px] bg-indigo-500 text-white font-bold px-2 py-2.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1 shadow-sm">🔍 全文辨識</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 輸入列 -->
+            <div class="p-3 bg-slate-50 border-t border-slate-100 flex gap-2 mt-1 items-end">
+                <input type="file" id="chatImageUpload" accept="image/*" class="hidden" @change="handleImageFile($event)">
+                <input type="file" id="chatCameraCapture" accept="image/*" capture="environment" class="hidden" @change="handleImageFile($event)">
+                <div class="relative flex-shrink-0">
+                    <button x-show="!pendingImage" @click="showImgMenu=!showImgMenu" class="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center active:scale-90 transition-transform shadow-sm"><i class="ph-fill ph-camera text-white text-lg"></i></button>
+                    <button x-show="pendingImage" @click="pendingImage=null;pendingImageMime=null;pendingImageBase64=null;chatInput=''" class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center active:scale-90 transition-transform border border-red-200"><i class="ph-bold ph-x text-red-500"></i></button>
+                    <div x-show="showImgMenu" @click.away="showImgMenu=false" class="absolute bottom-12 left-0 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden w-32 z-50">
+                        <button @click="document.getElementById('chatCameraCapture').click(); showImgMenu=false" class="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-bold text-slate-700 active:bg-slate-50 transition-colors"><i class="ph-fill ph-camera text-violet-500"></i> 拍照</button>
+                        <div class="h-px bg-slate-100"></div>
+                        <button @click="document.getElementById('chatImageUpload').click(); showImgMenu=false" class="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-bold text-slate-700 active:bg-slate-50 transition-colors"><i class="ph-fill ph-images text-indigo-500"></i> 相簿</button>
+                    </div>
+                </div>
+                <input type="text" x-model="chatInput" @keydown.enter="sendChat()" :placeholder="pendingImage?'自訂問題（或點上方按鈕）...':'輸入訊息...'" class="flex-1 bg-white border rounded-full px-4 py-2.5 text-sm outline-none focus:border-blue-400 transition-colors min-w-0">
+                <button @click="sendChat()" :disabled="(!chatInput.trim()&&!pendingImage)||isAiThinking" class="w-11 h-11 bg-blue-500 rounded-full text-white flex items-center justify-center shadow-md active:scale-95 disabled:opacity-40 disabled:scale-100 transition-all flex-shrink-0">
+                    <i class="ph-bold" :class="isAiThinking?'ph-spinner-gap animate-spin':'ph-paper-plane-right'"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-nav">
+        <div class="px-4">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">2026 韓國釜山 🇰🇷</h1>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">JUN 24 - 28 • 5 DAYS • 5 PAX</p>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl px-3 py-1.5 flex items-center gap-2 cursor-pointer active:bg-slate-100 transition-colors" @click="showWeatherDetail=!showWeatherDetail">
+                    <i :class="getCurrentWeather().icon+' text-xl text-sky-500'"></i>
+                    <div class="text-left">
+                        <div class="text-[10px] text-slate-400 font-bold flex items-center gap-1"><span x-text="getCurrentWeather().loc"></span><i class="ph-bold ph-caret-down text-[8px] transition-transform duration-200" :class="showWeatherDetail?'rotate-180':''"></i></div>
+                        <div class="text-sm font-bold text-slate-800 flex items-center gap-1"><span x-text="getCurrentWeather().temp"></span><span class="text-[10px] font-normal text-slate-400" x-text="getCurrentWeather().desc"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 天氣展開 -->
+            <div x-show="showWeatherDetail" x-cloak class="bg-sky-50 border border-sky-100 rounded-2xl px-4 py-3 mb-3 flex items-start gap-3" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+                <i :class="getCurrentWeather().icon+' text-2xl text-sky-500 flex-shrink-0 mt-0.5'"></i>
+                <div class="flex-1">
+                    <div class="flex items-baseline gap-2 mb-1"><span class="text-lg font-black text-slate-800" x-text="getCurrentWeather().temp"></span><span class="text-sm text-slate-500" x-text="getCurrentWeather().desc"></span><span class="text-xs text-slate-400" x-text="getCurrentWeather().loc"></span></div>
+                    <div class="flex items-center gap-1.5 text-xs text-sky-700 font-bold bg-sky-100 rounded-xl px-3 py-1.5"><i class="ph-fill ph-t-shirt text-sm"></i><span x-text="getCurrentWeather().outfit||'天氣資料載入中...'"></span></div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2" id="tabContainer">
+                <button @click="slideTo(0)" id="tab-0" class="tab-btn flex-shrink-0" :class="activeIndex===0?'tab-active':'tab-inactive'">行前</button>
+                <button @click="slideTo(1)" id="tab-1" class="tab-btn flex-shrink-0" :class="activeIndex===1?'tab-active':'tab-inactive'">資訊</button>
+                <button @click="slideTo(2)" id="tab-2" class="tab-btn flex-shrink-0" :class="activeIndex===2?'tab-active':'tab-inactive'">記帳</button>
+                <template x-for="(day,index) in days" :key="index">
+                    <button @click="slideTo(index+3)" :id="'tab-'+(index+3)" class="tab-btn flex-shrink-0 relative" :class="activeIndex===(index+3)?'tab-active':'tab-inactive'">
+                        <span x-text="day.shortTitle"></span>
+                        <span x-show="isTodayTab(index)" class="absolute top-0 right-0 w-2 h-2 bg-blue-400 rounded-full live-dot border border-white"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </header>
+
+    <main class="px-0">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+
+                <!-- Slide 0: 行前 -->
+                <div class="swiper-slide px-4">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">必備預約清單</h3>
+                    <div class="grid gap-3 mb-8">
+                        <template x-for="ticket in prepData.tickets">
+                            <div class="ios-card p-4 flex justify-between items-center">
+                                <div><div class="font-bold text-slate-800" x-text="ticket.name"></div><div class="text-xs text-slate-400 mt-0.5" x-text="ticket.desc"></div></div>
+                                <a :href="ticket.link" target="_blank" class="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full text-xs font-bold active:bg-slate-200">預約</a>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-3 ml-1">
+                        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">出發前檢查</h3>
+                        <button @click="resetData()" class="text-[10px] text-slate-400 underline">重置清單</button>
+                    </div>
+                    <div class="ios-card p-4 mb-4">
+                        <div class="flex justify-between text-xs font-bold mb-2"><span class="text-slate-500">打包進度</span><span class="text-green-500" x-text="luggageProgress+'%'"></span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-2 bg-green-400 rounded-full transition-all duration-500" :style="'width:'+luggageProgress+'%'"></div></div>
+                    </div>
+                    <div class="ios-card overflow-hidden mb-8">
+                        <template x-for="(items,category) in prepData.luggage">
+                            <div class="border-b border-gray-100 last:border-0">
+                                <div class="bg-gray-50 px-4 py-2 text-[10px] font-bold text-slate-400 uppercase" x-text="category"></div>
+                                <template x-for="item in items">
+                                    <div @click="toggleCheck(item)" class="flex items-center gap-3 px-4 py-3 active:bg-gray-50 cursor-pointer">
+                                        <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center check-circle flex-shrink-0" :class="item.checked?'checked-bg border-transparent':'border-gray-300'"><i x-show="item.checked" class="ph-bold ph-check text-white text-sm"></i></div>
+                                        <span class="text-sm font-medium text-slate-700" :class="{'line-through opacity-40':item.checked}" x-text="item.name"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-3 ml-1">
+                        <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider">🛍️ 必買戰利品清單</h3>
+                        <div class="flex gap-2">
+                            <button @click="exportShopping()" class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full active:scale-95 transition-transform flex items-center gap-1"><i class="ph-bold ph-export"></i> 分享</button>
+                            <button @click="openAddModal()" class="text-xs font-bold text-white bg-blue-500 px-3 py-1 rounded-full shadow active:scale-95 transition-transform flex items-center gap-1"><i class="ph-bold ph-plus"></i> 新增</button>
+                        </div>
+                    </div>
+                    <div class="ios-card overflow-hidden mb-8">
+                        <template x-for="(items,category) in prepData.shopping">
+                            <div class="border-b border-gray-100 last:border-0" x-show="items.length>0">
+                                <div class="bg-gray-50 px-4 py-2 text-[10px] font-bold text-slate-400 uppercase" x-text="category"></div>
+                                <template x-for="(item,idx) in items">
+                                    <div @click="toggleCheck(item)" class="flex items-center justify-between px-4 py-3 active:bg-gray-50 cursor-pointer">
+                                        <div class="flex items-center gap-3 flex-1">
+                                            <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center check-circle transition-colors flex-shrink-0" :class="item.checked?'bg-blue-500 border-blue-500':'border-gray-300'"><i x-show="item.checked" class="ph-bold ph-check text-white text-sm"></i></div>
+                                            <div><div class="text-sm font-bold text-slate-700" :class="{'line-through opacity-40':item.checked}" x-text="item.name"></div><div class="text-[10px] text-slate-400" x-text="item.desc"></div></div>
+                                        </div>
+                                        <button @click.stop="deleteItem(category,idx)" class="p-2 text-slate-300 hover:text-red-500 transition-colors"><i class="ph-bold ph-trash"></i></button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Slide 1: 資訊 -->
+                <div class="swiper-slide px-4 pb-6">
+                    <!-- 票券收納 -->
+                    <div class="ios-card p-4 mb-6 bg-slate-800 text-white">
+                        <div class="flex items-center gap-2 mb-4"><i class="ph-fill ph-ticket text-yellow-400 text-xl"></i><h3 class="font-bold">票券收納夾</h3></div>
+                        <div class="space-y-3">
+                            <template x-for="(val,key) in prepData.ticketsWallet">
+                                <div class="bg-slate-700/50 rounded-xl p-3 flex justify-between items-center">
+                                    <div class="flex-1 mr-2">
+                                        <div class="text-[10px] text-slate-400 uppercase font-bold" x-text="key"></div>
+                                        <input type="text" x-model="prepData.ticketsWallet[key]" @change="saveChecks()" placeholder="輸入代號或說明..." class="bg-transparent w-full text-sm font-mono font-bold outline-none text-white placeholder-slate-600">
+                                    </div>
+                                    <button @click="copyToClipboard(prepData.ticketsWallet[key])" class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center active:scale-95"><i class="ph-bold ph-copy text-slate-300"></i></button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- VISIT BUSAN PASS 說明卡 -->
+                    <div class="ios-card p-4 mb-6 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0"><i class="ph-fill ph-ticket text-xl"></i></div>
+                            <div><div class="font-black text-lg">VISIT BUSAN PASS</div><div class="text-xs opacity-80">48H 景點通票 • DAY2 13:30 啟用</div></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-white/15 rounded-xl p-2.5"><div class="font-bold mb-1">✅ 免費景點</div><div class="opacity-90 leading-5">海岸列車<br>Skyline Luge<br>Spa Land<br>BUSAN X the Sky<br>松島纜車<br>廣安里遊艇</div></div>
+                            <div class="bg-white/15 rounded-xl p-2.5"><div class="font-bold mb-1">📋 使用注意</div><div class="opacity-90 leading-5">48H 從首次刷卡起算<br>遊艇需提前預約<br>Spa Land 確認入場時間<br>海岸列車需現場換票</div></div>
+                        </div>
+                    </div>
+
+                    <!-- 實用連結 -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <a href="https://www.kakaocorp.com/page/service/service/KakaoT" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
+                            <i class="ph-duotone ph-taxi text-2xl text-yellow-500 mb-1"></i><span class="text-xs font-bold text-slate-700">Kakao T 叫車</span>
+                        </a>
+                        <a href="https://www.visitbusan.net/tw/index.do" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
+                            <i class="ph-duotone ph-map-trifold text-2xl text-blue-500 mb-1"></i><span class="text-xs font-bold text-slate-700">釜山旅遊官網</span>
+                        </a>
+                        <a href="https://www.lottedfs.com/tw" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
+                            <i class="ph-duotone ph-shopping-bag text-2xl text-pink-500 mb-1"></i><span class="text-xs font-bold text-slate-700">樂天免稅店</span>
+                        </a>
+                        <a href="https://papago.naver.com/" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
+                            <i class="ph-duotone ph-translate text-2xl text-green-500 mb-1"></i><span class="text-xs font-bold text-slate-700">Papago 翻譯</span>
+                        </a>
+                    </div>
+
+                    <!-- 手指韓文 -->
+                    <div class="ios-card p-4 mb-4">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><i class="ph-fill ph-translate"></i></div>
+                            <h3 class="font-bold text-slate-800">手指韓文</h3>
+                        </div>
+                        <div class="flex bg-slate-100 rounded-lg p-1 mb-4">
+                            <button @click="phraseTab='food'" class="flex-1 py-1.5 rounded-md text-xs font-bold transition-all" :class="phraseTab==='food'?'bg-white shadow text-slate-800':'text-slate-400'">餐廳</button>
+                            <button @click="phraseTab='shop'" class="flex-1 py-1.5 rounded-md text-xs font-bold transition-all" :class="phraseTab==='shop'?'bg-white shadow text-slate-800':'text-slate-400'">購物</button>
+                            <button @click="phraseTab='help'" class="flex-1 py-1.5 rounded-md text-xs font-bold transition-all" :class="phraseTab==='help'?'bg-white shadow text-red-500':'text-slate-400'">緊急</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="p in phrases[phraseTab]">
+                                <div @click="openPhrase(p,phraseTab)" class="bg-gray-50 border border-gray-100 rounded-xl p-3 active:bg-gray-100 active:scale-95 transition-transform text-center cursor-pointer">
+                                    <div class="text-sm font-bold text-slate-800 truncate" x-text="p.kr"></div>
+                                    <div class="text-[10px] text-slate-500 mt-1 flex justify-center items-center gap-1"><span x-text="p.cn"></span> <i class="ph-bold ph-speaker-high text-blue-400"></i></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- 即時翻譯 -->
+                    <div class="ios-card p-4 mb-4" x-data="translatorWidget()">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-500 flex-shrink-0"><i class="ph-fill ph-waveform"></i></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-slate-800">即時翻譯</h3>
+                                <p class="text-[10px] text-slate-400">語音輸入 • 自動翻譯 • 朗讀給對方聽</p>
+                            </div>
+                            <div class="flex bg-slate-100 rounded-lg p-0.5">
+                                <button @click="sourceLang='zh'; originalText=''; translatedText='';" class="px-2.5 py-1 rounded-md text-xs font-bold transition-all" :class="sourceLang==='zh'?'bg-white shadow text-violet-600':'text-slate-400'">中→韓</button>
+                                <button @click="sourceLang='ko'; originalText=''; translatedText='';" class="px-2.5 py-1 rounded-md text-xs font-bold transition-all" :class="sourceLang==='ko'?'bg-white shadow text-violet-600':'text-slate-400'">韓→中</button>
+                            </div>
+                        </div>
+                        <div x-show="!speechSupported" class="bg-orange-50 border border-orange-100 rounded-2xl p-4 text-center">
+                            <i class="ph-fill ph-warning-circle text-orange-400 text-2xl mb-2 block"></i>
+                            <div class="text-sm text-orange-700 font-bold">此裝置不支援語音辨識</div>
+                            <div class="text-[10px] text-orange-500 mt-1">建議使用 Chrome 或 Safari</div>
+                        </div>
+                        <div x-show="speechSupported">
+                            <div class="flex flex-col items-center py-5">
+                                <button @click="toggleRecording()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-90 relative" :class="isRecording?'bg-red-500':'bg-gradient-to-br from-violet-500 to-purple-600'">
+                                    <div x-show="isRecording" class="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-25"></div>
+                                    <i class="ph-fill text-white text-4xl relative z-10" :class="isRecording?'ph-stop-circle':'ph-microphone'"></i>
+                                </button>
+                                <div class="mt-3 text-sm font-bold" :class="isRecording?'text-red-500':'text-violet-600'" x-text="isRecording?'🔴 錄音中⋯說完自動翻譯':(sourceLang==='zh'?'🎙 按下說中文':'🎙 按下說韓文')"></div>
+                            </div>
+                            <div x-show="originalText||isRecording" class="bg-slate-50 border border-slate-100 rounded-2xl p-3 mb-3">
+                                <div class="text-[10px] text-slate-400 font-bold mb-1.5 flex items-center gap-1.5"><i class="ph-bold ph-ear"></i><span x-text="sourceLang==='zh'?'辨識中文':'辨識韓文'"></span></div>
+                                <div class="text-base text-slate-700 font-medium min-h-6" x-text="originalText||'聆聽中⋯'"></div>
+                            </div>
+                            <div x-show="isTranslating" class="flex items-center justify-center gap-2 py-4 text-violet-500"><i class="ph-bold ph-spinner-gap animate-spin text-2xl"></i><span class="text-sm font-bold">翻譯中...</span></div>
+                            <div x-show="translatedText&&!isTranslating" class="rounded-2xl p-4 border" :class="sourceLang==='zh'?'bg-red-50 border-red-100':'bg-sky-50 border-sky-100'">
+                                <div class="text-[10px] font-bold mb-2 flex items-center gap-1" :class="sourceLang==='zh'?'text-red-400':'text-sky-400'"><i class="ph-bold ph-translate"></i><span x-text="sourceLang==='zh'?'韓文':'中文'"></span></div>
+                                <div class="text-2xl font-bold text-slate-800 leading-snug mb-3" x-text="translatedText"></div>
+                                <div class="flex gap-2">
+                                    <button @click="speakTranslation()" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold active:scale-95 transition-all shadow-sm text-white" :class="isSpeaking?'bg-violet-400':(sourceLang==='zh'?'bg-red-500':'bg-sky-500')">
+                                        <i class="ph-fill text-lg" :class="isSpeaking?'ph-speaker-high animate-pulse':'ph-speaker-high'"></i>
+                                        <span x-text="isSpeaking?'播放中...':'🔊 朗讀給對方聽'"></span>
+                                    </button>
+                                    <button @click="copyToClipboard(translatedText)" class="w-12 flex items-center justify-center rounded-xl bg-slate-100 text-slate-500 active:scale-95 transition-transform flex-shrink-0"><i class="ph-bold ph-copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2: 記帳 -->
+                <div class="swiper-slide px-4">
+                    <div class="ios-card bg-slate-800 text-white p-6 mb-6 shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                        <div class="text-xs text-slate-400 mb-1 font-bold uppercase tracking-wider">總花費 (韓幣)</div>
+                        <div class="text-4xl font-black mb-2 flex items-baseline gap-1">₩ <span x-text="totalSpent.toLocaleString()"></span></div>
+                        <div class="text-sm text-slate-400 font-bold">≈ NT$ <span x-text="Math.round(totalSpent * 0.023).toLocaleString()"></span></div>
+                        <div x-show="moneyList.length>0" class="mt-4 space-y-2">
+                            <template x-for="cat in ['food','shop','traffic','other']">
+                                <div x-show="getCatTotal(cat)>0" class="flex items-center gap-2">
+                                    <div class="text-[10px] text-slate-400 w-8 flex-shrink-0" x-text="getCatLabel(cat)"></div>
+                                    <div class="flex-1 bg-white/10 rounded-full h-1.5 overflow-hidden"><div class="h-1.5 rounded-full transition-all duration-700" :class="'money-bar-'+cat" :style="'width:'+(getCatTotal(cat)/totalSpent*100).toFixed(0)+'%'"></div></div>
+                                    <div class="text-[10px] text-slate-300 font-mono w-16 text-right" x-text="'₩'+getCatTotal(cat).toLocaleString()"></div>
+                                </div>
+                            </template>
+                        </div>
+                        <button @click="showMoneyModal=true; newMoney={title:'',amount:'',cat:'food'}" class="absolute bottom-4 right-4 bg-emerald-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="ph-bold ph-plus text-xl"></i></button>
+                    </div>
+                    <div class="flex justify-between items-end mb-3 ml-1">
+                        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">消費紀錄</h3>
+                        <div class="flex gap-2">
+                            <button @click="exportMoney()" class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full active:scale-95 transition-transform flex items-center gap-1"><i class="ph-bold ph-export"></i> 分享</button>
+                            <button @click="resetMoney()" class="text-[10px] text-slate-400 underline">重置</button>
+                        </div>
+                    </div>
+                    <div class="space-y-3" x-show="moneyList.length>0">
+                        <template x-for="(item,idx) in moneyList" :key="idx">
+                            <div class="money-item-card p-3 flex items-center gap-2">
+                                <div class="flex items-center gap-3 flex-1 min-w-0" @click="editMoney={...item,idx}; showEditMoneyModal=true;">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0" :class="getMoneyIcon(item.cat).bg"><i :class="getMoneyIcon(item.cat).icon"></i></div>
+                                    <div class="min-w-0"><div class="font-bold text-slate-800 truncate" x-text="item.title"></div><div class="text-[10px] text-slate-400 flex items-center gap-1"><span x-text="item.date"></span><span class="text-slate-200">•</span><span x-text="getCatLabel(item.cat)"></span></div></div>
+                                </div>
+                                <div class="text-right flex-shrink-0" @click="editMoney={...item,idx}; showEditMoneyModal=true;"><div class="font-bold font-mono text-slate-800">₩<span x-text="Number(item.amount).toLocaleString()"></span></div></div>
+                                <button @click.stop="deleteMoney(idx); toast('已刪除');" class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0 active:bg-red-100 active:scale-90 transition-all ml-1"><i class="ph-bold ph-trash text-red-400"></i></button>
+                            </div>
+                        </template>
+                    </div>
+                    <div x-show="moneyList.length===0" class="text-center text-slate-400 text-xs mt-10">還沒有消費紀錄，按右上角 + 記一筆吧！</div>
+                </div>
+
+                <!-- 每日行程 -->
+                <template x-for="(day,index) in days" :key="index">
+                    <div class="swiper-slide px-4">
+                        <div class="ios-card p-4 text-center mb-4">
+                            <h2 class="text-lg font-bold text-slate-800" x-text="day.title"></h2>
+                            <p class="text-xs text-slate-400 mt-1" x-text="day.subtitle"></p>
+                            <div class="flex justify-center mt-2 gap-2 flex-wrap">
+                                <div class="bg-blue-50 px-3 py-1 rounded-full text-xs font-bold text-blue-600 flex items-center gap-1"><i class="ph-fill ph-bed text-blue-500"></i>Shilla Stay 海雲台</div>
+                                <div x-show="day.passDay" class="bg-green-50 px-3 py-1 rounded-full text-xs font-bold text-green-700 flex items-center gap-1"><i class="ph-fill ph-ticket text-green-500"></i><span x-text="day.passDay"></span></div>
+                            </div>
+                        </div>
+
+                        <div class="relative pl-4">
+                            <div class="timeline-line"></div>
+                            <div class="space-y-6">
+                                <template x-for="(event,eIdx) in day.events" :key="event.time+eIdx">
+                                    <div class="relative pl-10" :id="'event-'+index+'-'+eIdx" x-data="{expanded:false}">
+                                        <div class="absolute left-0 top-0 flex flex-col items-center z-10">
+                                            <div class="w-12 h-12 rounded-full border-4 border-[#F2F2F7] flex items-center justify-center shadow-sm" :class="getIconColor(event.type)">
+                                                <i :class="getIconClass(event.type)+' text-white text-lg'"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ios-card overflow-hidden transition-all duration-500" :class="{'active-event-card':isCurrentEvent(index,event)}">
+                                            <div class="p-4" @click="expanded=!expanded; $nextTick(()=>updateSwiperHeight())">
+                                                <div class="flex justify-between items-start mb-1">
+                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                        <span class="text-xs font-black text-slate-300 bg-slate-50 px-1.5 py-0.5 rounded font-mono" :class="{'text-blue-500 bg-blue-50':isCurrentEvent(index,event)}" x-text="event.time"></span>
+                                                        <template x-if="isCurrentEvent(index,event)"><span class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">進行中 NOW</span></template>
+                                                        <template x-if="event.isPass"><span class="pass-badge">PASS</span></template>
+                                                        <template x-if="event.isWarn"><span class="warn-badge">⚠ 注意</span></template>
+                                                    </div>
+                                                    <template x-if="event.tag"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" :class="getTagColor(event.tag)" x-text="event.tag"></span></template>
+                                                </div>
+                                                <h3 class="text-lg font-bold text-slate-800 mb-1" x-text="event.name"></h3>
+                                                <p class="text-sm text-slate-500 line-clamp-2" x-text="event.desc"></p>
+                                                <template x-if="event.taxi">
+                                                    <div class="mt-2"><button @click.stop="openTaxi(event)" class="text-xs font-bold text-black bg-yellow-400 px-3 py-1.5 rounded-lg flex items-center gap-2 active:scale-95 transition-transform"><i class="ph-bold ph-taxi"></i> 給司機看 (Taxi Card)</button></div>
+                                                </template>
+                                                <div class="flex justify-center mt-2" x-show="event.restaurants||event.shopping||event.detail||event.tips||event.location">
+                                                    <i class="ph-bold ph-caret-down text-slate-300 transition-transform duration-300" :class="{'rotate-180':expanded}"></i>
+                                                </div>
+                                            </div>
+                                            <div class="bg-slate-50 border-t border-slate-100 text-sm expand-content" :class="{'expanded':expanded}">
+                                                <div class="p-4 space-y-4">
+                                                    <template x-if="event.detail">
+                                                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-slate-600">
+                                                            <div class="text-xs font-bold text-blue-500 mb-2 uppercase flex items-center gap-1"><i class="ph-bold ph-info"></i> 詳細說明</div>
+                                                            <div class="text-xs leading-6" x-html="event.detail"></div>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="event.tips">
+                                                        <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 text-amber-900 text-xs leading-relaxed flex gap-2">
+                                                            <i class="ph-fill ph-warning-circle text-lg flex-shrink-0 text-amber-500"></i>
+                                                            <div><span class="font-bold">小提醒：</span><span x-html="event.tips"></span></div>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="event.restaurants">
+                                                        <div>
+                                                            <div class="text-xs font-bold text-slate-400 mb-2 uppercase">餐廳選擇</div>
+                                                            <div class="space-y-2">
+                                                                <template x-for="(rest,idx) in event.restaurants">
+                                                                    <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                                                                        <div class="flex justify-between items-start mb-2">
+                                                                            <div>
+                                                                                <div class="flex items-center gap-2 mb-1"><span class="text-[10px] px-1.5 rounded text-white font-bold" :class="idx===0?'bg-orange-400':'bg-slate-300'" x-text="idx===0?'首選':'備案'"></span><span class="font-bold text-slate-700" x-text="rest.name"></span></div>
+                                                                                <div class="text-xs text-slate-500">✨ <span x-text="rest.dish"></span></div>
+                                                                            </div>
+                                                                            <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(rest.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                        </div>
+                                                                        <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                                                            <div class="flex items-center gap-1 text-slate-600"><i class="ph-bold ph-currency-krw"></i><span x-text="rest.price||'10,000-20,000'"></span>/人</div>
+                                                                            <div class="flex items-center gap-1 text-slate-600"><i class="ph-bold ph-clock"></i><span x-text="rest.queue||'建議提早'"></span></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="event.shopping">
+                                                        <div>
+                                                            <div class="text-xs font-bold text-slate-400 mb-2 uppercase">必買必逛</div>
+                                                            <div class="space-y-2">
+                                                                <template x-for="shop in event.shopping">
+                                                                    <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center">
+                                                                        <div><span class="font-bold text-slate-700" x-text="shop.name"></span><div class="text-xs text-slate-500 mt-1">🛍️ <span x-text="shop.items"></span></div></div>
+                                                                        <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(shop.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="!event.restaurants&&event.location">
+                                                        <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(event.name+' '+event.location)" target="_blank" class="flex items-center justify-center gap-2 w-full bg-blue-500 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform"><i class="ph-fill ph-navigation-arrow"></i> 導航至此</a>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-8 pb-12 text-slate-300 font-mono"><p class="text-[10px]"><span x-text="statusMsg"></span></p></footer>
+
+    <!-- 韓文詞卡 Modal -->
+    <div x-show="modalOpen" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" @click.self="modalOpen=false">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl relative">
+            <button @click="modalOpen=false" class="absolute top-4 right-4 bg-gray-100 p-2 rounded-full"><i class="ph-bold ph-x text-lg"></i></button>
+            <span class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold mb-4" x-text="currentPhrase.cat"></span>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2 leading-tight" x-text="currentPhrase.kr"></h2>
+            <p class="text-slate-400 text-sm font-mono mb-6" x-text="currentPhrase.romaji"></p>
+            <div class="border-t pt-4 mb-4"><p class="text-xl font-bold text-slate-600" x-text="currentPhrase.cn"></p></div>
+            <button @click="speak(currentPhrase.kr,'ko-KR')" class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:bg-slate-200 transition-colors"><i class="ph-fill ph-speaker-high text-xl"></i> 唸給對方聽</button>
+        </div>
+    </div>
+
+    <!-- Taxi Modal -->
+    <div x-show="showTaxiModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" @click.self="showTaxiModal=false">
+        <div class="bg-white w-full h-auto max-w-md rounded-3xl p-8 text-center shadow-2xl relative">
+            <button @click="showTaxiModal=false" class="absolute top-6 right-6 bg-gray-100 p-3 rounded-full"><i class="ph-bold ph-x text-xl"></i></button>
+            <div class="mb-6"><div class="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-bold mb-2">TAXI CARD</div><p class="text-slate-400 text-xs">請將此畫面出示給司機看</p></div>
+            <div class="space-y-6">
+                <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100"><p class="text-xs text-slate-400 mb-1">給司機的話：</p><p class="text-lg font-bold text-slate-800">여기까지 가주세요.</p></div>
+                <div><p class="text-xs text-slate-400 mb-2">目的地</p><h2 class="text-3xl font-black text-slate-900 leading-tight mb-4" x-text="currentTaxi.krName"></h2><div class="bg-slate-100 p-4 rounded-xl"><p class="text-lg font-bold text-slate-700 font-mono" x-text="currentTaxi.address"></p></div></div>
+            </div>
+            <button @click="speak(currentTaxi.address,'ko-KR')" class="mt-8 w-full bg-yellow-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md"><i class="ph-fill ph-speaker-high text-xl"></i> 唸出地址</button>
+        </div>
+    </div>
+
+    <!-- 新增購物 Modal -->
+    <div x-show="showAddModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" @click.self="showAddModal=false">
+        <div class="bg-white w-11/12 max-w-sm rounded-3xl p-6 shadow-2xl relative">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-slate-800">新增購物項目</h3><button @click="showAddModal=false" class="bg-gray-100 p-2 rounded-full active:bg-gray-200"><i class="ph-bold ph-x"></i></button></div>
+            <div class="space-y-4">
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">類別</label><select x-model="newItem.cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-400"><template x-for="(items,category) in prepData.shopping" :key="category"><option :value="category" x-text="category"></option></template></select></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">商品名稱</label><input x-model="newItem.name" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-400" placeholder="例如: 海苔禮盒"></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">備註 (選填)</label><input x-model="newItem.desc" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm text-slate-500 outline-none focus:border-blue-400" placeholder="數量 / 規格"></div>
+                <button @click="addItem()" class="w-full bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 active:scale-95 transition-transform mt-2">確認新增</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 記帳 Modal -->
+    <div x-show="showMoneyModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" @click.self="showMoneyModal=false">
+        <div class="bg-white w-11/12 max-w-sm rounded-3xl p-6 shadow-2xl relative">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-slate-800">記一筆 💸</h3><button @click="showMoneyModal=false" class="bg-gray-100 p-2 rounded-full active:bg-gray-200"><i class="ph-bold ph-x"></i></button></div>
+            <div class="space-y-3">
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">項目名稱</label><input x-model="newMoney.title" type="text" placeholder="午餐 / 伴手禮" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base font-bold text-slate-700 outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">金額 (韓幣 ₩)</label><input x-model="newMoney.amount" type="number" inputmode="numeric" placeholder="₩" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xl font-mono font-bold text-slate-700 outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">分類</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button @click="newMoney.cat='food'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="newMoney.cat==='food'?'bg-orange-100 border-orange-400 text-orange-600':'bg-white border-slate-200 text-slate-400'">飲食</button>
+                        <button @click="newMoney.cat='shop'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="newMoney.cat==='shop'?'bg-pink-100 border-pink-400 text-pink-600':'bg-white border-slate-200 text-slate-400'">購物</button>
+                        <button @click="newMoney.cat='traffic'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="newMoney.cat==='traffic'?'bg-blue-100 border-blue-400 text-blue-600':'bg-white border-slate-200 text-slate-400'">交通</button>
+                        <button @click="newMoney.cat='other'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="newMoney.cat==='other'?'bg-gray-100 border-gray-400 text-gray-600':'bg-white border-slate-200 text-slate-400'">其他</button>
+                    </div>
+                </div>
+                <button @click="addMoney()" class="w-full font-bold py-3 rounded-xl mt-2 active:scale-95 transition-all shadow-md" :class="newMoney.title&&newMoney.amount>0?'bg-slate-800 text-white':'bg-slate-200 text-slate-400'">儲存紀錄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯記帳 Modal -->
+    <div x-show="showEditMoneyModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" @click.self="showEditMoneyModal=false">
+        <div class="bg-white w-11/12 max-w-sm rounded-3xl p-6 shadow-2xl relative">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-slate-800">編輯紀錄 ✏️</h3><button @click="showEditMoneyModal=false" class="bg-gray-100 p-2 rounded-full active:bg-gray-200"><i class="ph-bold ph-x"></i></button></div>
+            <div class="space-y-3">
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">項目名稱</label><input x-model="editMoney.title" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base font-bold text-slate-700 outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">金額 (韓幣 ₩)</label><input x-model="editMoney.amount" type="number" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xl font-mono font-bold text-slate-700 outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-1 block mb-1">分類</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button @click="editMoney.cat='food'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="editMoney.cat==='food'?'bg-orange-100 border-orange-400 text-orange-600':'bg-white border-slate-200 text-slate-400'">飲食</button>
+                        <button @click="editMoney.cat='shop'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="editMoney.cat==='shop'?'bg-pink-100 border-pink-400 text-pink-600':'bg-white border-slate-200 text-slate-400'">購物</button>
+                        <button @click="editMoney.cat='traffic'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="editMoney.cat==='traffic'?'bg-blue-100 border-blue-400 text-blue-600':'bg-white border-slate-200 text-slate-400'">交通</button>
+                        <button @click="editMoney.cat='other'" class="py-2 rounded-lg text-xs font-bold border transition-all" :class="editMoney.cat==='other'?'bg-gray-100 border-gray-400 text-gray-600':'bg-white border-slate-200 text-slate-400'">其他</button>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-1">
+                    <button @click="confirmDeleteMoney()" class="flex-1 bg-red-50 text-red-500 font-bold py-3 rounded-xl border border-red-200 active:scale-95 transition-transform flex items-center justify-center gap-1"><i class="ph-bold ph-trash"></i> 刪除</button>
+                    <button @click="saveEditMoney()" class="flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl active:scale-95 transition-transform shadow-md">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+function translatorWidget() {
+    return {
+        sourceLang: 'zh', isRecording: false, isTranslating: false,
+        originalText: '', translatedText: '',
+        speechSupported: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+        recognition: null, isSpeaking: false,
+        init() { this.speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
+        toggleRecording() { if (!this.speechSupported) return; this.isRecording ? this.stopRecording() : this.startRecording(); },
+        startRecording() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SR();
+            this.recognition.lang = this.sourceLang === 'zh' ? 'zh-TW' : 'ko-KR';
+            this.recognition.interimResults = true; this.recognition.continuous = false;
+            this.originalText = ''; this.translatedText = ''; this.isRecording = true;
+            this.recognition.onresult = (e) => { let interim = '', final = ''; for (let i = e.resultIndex; i < e.results.length; i++) { if (e.results[i].isFinal) final += e.results[i][0].transcript; else interim += e.results[i][0].transcript; } this.originalText = final || interim; };
+            this.recognition.onend = () => { this.isRecording = false; if (this.originalText.trim()) this.translate(this.originalText.trim()); };
+            this.recognition.onerror = (e) => { this.isRecording = false; if (e.error === 'not-allowed') this.originalText = '⚠️ 請允許麥克風權限'; else if (e.error !== 'no-speech') this.originalText = '辨識失敗，請再試一次'; };
+            this.recognition.start();
+        },
+        stopRecording() { if (this.recognition) this.recognition.stop(); this.isRecording = false; },
+        async translate(text) {
+            this.isTranslating = true;
+            const langPair = this.sourceLang === 'zh' ? 'zh-TW|ko' : 'ko|zh-TW';
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`);
+                const data = await res.json();
+                const result = data.responseData?.translatedText || '';
+                this.translatedText = result.startsWith('MYMEMORY') ? '翻譯失敗，請稍後再試' : result;
+                this.$nextTick(() => this.speakTranslation());
+            } catch(e) { this.translatedText = '翻譯失敗，請檢查網路'; } finally { this.isTranslating = false; }
+        },
+        speakTranslation() {
+            if (!this.translatedText || !window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(this.translatedText);
+            utter.lang = this.sourceLang === 'zh' ? 'ko-KR' : 'zh-TW';
+            utter.rate = 0.9; this.isSpeaking = true;
+            utter.onend = () => { this.isSpeaking = false; };
+            utter.onerror = () => { this.isSpeaking = false; };
+            window.speechSynthesis.speak(utter);
+        },
+        copyToClipboard(text) { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text); } }
+    };
+}
+
+function tripData() {
+    const daysData = [
+        {
+            shortTitle: 'D1 6/24', title: 'Day 1：抵達 · 海雲台放鬆日', subtitle: '輕鬆步行，感受釜山海岸風情',
+            events: [
+                { time: '14:00', type: 'flight', name: '🛬 抵達金海機場', desc: '搭乘預約好的包車大車直達 Shilla Stay 海雲台。', location: '김해국제공항 Gimhae Airport', detail: '🔹包車：KKday / Klook 預約「商務9人車」<br>🔹5人加5件大行李一車直達<br>🔹車程約 35–45 分鐘' },
+                { time: '15:00', type: 'hotel', name: '🏨 Check-in · 放行李', desc: 'Shilla Stay 海雲台，整個行程都住這，不換房！', location: '해운대 신라스테이', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } },
+                { time: '16:30', type: 'activity', name: '🌊 海雲台沙灘 + 冬柏島步道', desc: '飯店下樓就是沙灘，沿木棧道走向冬柏島，全平路，長輩走起來很舒服。', location: '해운대 해수욕장', tips: '全程步行無需叫車，建議穿拖鞋或涼鞋，天氣炎熱記得帶水！' },
+                { time: '18:00', type: 'activity', name: '🌅 The Bay 101 夜景', desc: '從冬柏島步道順著走即達，拍攝海雲台摩天大樓天際線最佳地點。', location: '더베이101 해운대', detail: '從冬柏島步道直走，不需叫車。適合拍照打卡，夜幕低垂後燈光最美。' },
+                { time: '19:00', type: 'food', name: '🍽️ 晚餐：海雲台傳統市場', desc: '在飯店周邊覓食，推薦韓式烤肉、海鮮鍋或傳統市場小吃。', location: '해운대시장', restaurants: [
+                    { name: '해운대시장 海雲台市場', dish: '傳統小吃、海鮮', price: '5,000–15,000', queue: '直接入場' },
+                    { name: '유지네집 韓式烤肉', dish: '豬五花烤肉', price: '15,000–20,000', queue: '稍候即入' }
+                ]}
+            ]
+        },
+        {
+            shortTitle: 'D2 6/25', title: 'Day 2：海景火車 + 斜坡滑車', subtitle: '動線：尾浦 → 青沙浦 → 松亭（一路向東）', passDay: 'PASS 13:30 啟用',
+            events: [
+                { time: '09:30', type: 'transport', name: '🚕 出發前往尾浦站', desc: '車程約 5–10 分鐘。抵達後先持 Pass 到櫃檯換出 13:30 海岸列車車票！', isWarn: true, detail: '🔹搭計程車至尾浦站（미포）<br>🔹⚠ <b>抵達後立即換票</b>：持 VISIT BUSAN PASS 到尾浦站櫃檯，換出 13:30【青沙浦→松亭】的海岸列車實體票。熱門場次常賣完，務必一到就換！' },
+                { time: '10:00', type: 'train', name: '🚞 天空膠囊列車 尾浦→青沙浦', desc: '海景最美的方向，已預約！5人分成3人車+2人車。', isPass: false, tag: '需預約', detail: '🔹路線：尾浦站 → 青沙浦站<br>🔹此方向靠海座位最美<br>🔹5人預約：一台3人車 + 一台2人車<br>🔹官網：Blueline Park 提前2週預約<br>🔹費用：自費（非 Pass）', tips: '出發前2週上 Blueline Park 韓國官網預約，6/25 10:00~10:30 場次' },
+                { time: '10:40', type: 'activity', name: '🌊 青沙浦海女村 + 踏石觀景台', desc: '輕鬆散步，欣賞質樸海女文化與海岸景觀。', location: '청사포 해녀촌' },
+                { time: '12:00', type: 'food', name: '🍽️ 午餐：青沙浦海鮮', desc: '現撈海鮮，烤貝是這裡的招牌！', location: '청사포', restaurants: [
+                    { name: '청사포 조개구이 烤貝店', dish: '現烤各式貝類拼盤', price: '20,000–30,000', queue: '稍候即入' },
+                    { name: '청사포항 해물탕 海鮮湯', dish: '辣海鮮鍋', price: '15,000–25,000', queue: '即入' }
+                ]},
+                { time: '13:30', type: 'train', name: '🚆 海岸列車 青沙浦→松亭', isPass: true, desc: '正式刷 VISIT BUSAN PASS，啟用 48 小時計時！', detail: '🔹路線：청사포역 → 송정역<br>🔹⚠ 此車票為早上在尾浦站換出的實體票<br>🔹PASS 48H 從此刻起算，到明天 13:30 前有效' },
+                { time: '14:30', type: 'activity', name: '🛷 Skyline Luge 釜山斜坡滑車', isPass: true, desc: '從松亭站搭計程車5–10分鐘。不玩的長輩可在現場景觀咖啡廳休息。', location: '스카이라인 루지 부산', detail: '🔹從松亭站（송정역）搭計程車約 5–10 分鐘<br>🔹使用 VISIT BUSAN PASS 免費入場<br>🔹建議搭 2 趟：纜車上去 + 滑車下來', taxi: { krName: '스카이라인 루지 부산', address: '부산 기장군 기장읍 기장해안로 205' } },
+                { time: '17:00', type: 'transport', name: '🚕 搭車返回海雲台', desc: '今日行程結束，Kakao T 叫車返回飯店。', detail: '🔹用 Kakao T 叫 Venti（大車）接送5人<br>🔹車程約 30–40 分鐘' },
+                { time: '18:00', type: 'food', name: '🍽️ 晚餐：海雲台周邊', desc: '在飯店附近用餐，自由選擇。', restaurants: [
+                    { name: '해운대 갈매기 海鷗烤肉', dish: '豬五花、排骨烤肉', price: '15,000–25,000', queue: '建議稍早' },
+                    { name: '해운대 암소갈비집', dish: '牛排骨', price: '30,000–50,000', queue: '建議預約' }
+                ]},
+                { time: '19:30', type: 'activity', name: '🔱 晚間分流：泡湯 or 休息', desc: '自由選擇：去 Spa Land 泡湯，或直接回房充電。', isPass: true, detail: '🔹<b>泡湯組</b>：Kakao T 前往 Centum City（約10分鐘）→ Spa Land，使用 VISIT BUSAN PASS 免費入場。<b>請事先確認 PASS 當天最晚入場時間（通常22:00前）</b><br>🔹<b>回房組</b>：散步回 Shilla Stay，提早休息，明天行程豐富！', taxi: { krName: '스파랜드 센텀시티', address: '부산 해운대구 센텀남대로 59 신세계백화점 센텀시티' } }
+            ]
+        },
+        {
+            shortTitle: 'D3 6/26', title: 'Day 3：百樓展望 + 南浦洞 + 煙火遊艇', subtitle: '動線：飯店→展望台→松島→南浦洞→廣安里（已調整時間）', passDay: 'PASS DAY 2',
+            events: [
+                { time: '09:00', type: 'food', name: '🥣 早餐：鮑魚粥', desc: '推薦飯店附近的濟州家或本粥，健康暖胃。', location: '죽집 해운대', restaurants: [
+                    { name: '제주家 濟州家', dish: '鮑魚粥 전복죽', price: '12,000–15,000', queue: '即入' },
+                    { name: '본죽 本粥', dish: '多種韓式粥品', price: '8,000–14,000', queue: '即入' }
+                ]},
+                { time: '10:00', type: 'activity', name: '🏙️ BUSAN X the Sky 100 樓展望台', isPass: true, desc: '就在海雲台！超高速電梯直達100樓，透明玻璃步道俯瞰絕美海景，內有全球最高星巴克。', location: '엑스더스카이 해운대', detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹地點：엘시티 THE SHARP (LCT) 101F<br>🔹建議早上前往，人少視野清晰', taxi: { krName: '엑스더스카이', address: '부산 해운대구 달맞이길 30 엘시티 더샵 101층' } },
+                { time: '11:30', type: 'transport', name: '🚕 出發前往松島', isWarn: true, desc: '車程預抓 50–60 分鐘（週五上午可能塞車）。沿途行經兩大跨海大橋！', detail: '🔹⚠ <b>車程已調整</b>：原40分鐘改為預抓50–60分鐘緩衝<br>🔹兩大跨海大橋風景壯觀，長輩可車上補眠<br>🔹用 Kakao T 叫 Venti 大車' },
+                { time: '12:45', type: 'activity', name: '🚡 松島海上纜車', isPass: true, desc: 'Songdo Bay → Sky Park，水晶車廂，海景震撼！', location: '송도해상케이블카', taxi: { krName: '송도해상케이블카', address: '부산 서구 송도해변로 171' }, detail: '🔹使用 VISIT BUSAN PASS 免費搭乘<br>🔹水晶透明底板車廂，往返約 20 分鐘<br>🔹建議搭一趟去一趟回，體驗最完整' },
+                { time: '13:45', type: 'food', name: '🍽️ 午餐：松島周邊海鮮', desc: '就在纜車站附近用餐，新鮮海產。', location: '송도', restaurants: [
+                    { name: '송도 해물탕 海鮮鍋', dish: '辣海鮮鍋 해물탕', price: '15,000–25,000', queue: '即入' },
+                    { name: '송도 횟집 생선구이', dish: '烤魚定食', price: '12,000–18,000', queue: '即入' }
+                ]},
+                { time: '15:00', type: 'activity', name: '🛍️ 南浦洞市區 3 小時', desc: 'BIFF廣場、國際市場、富平罐頭市場，邊走邊吃小吃、採買海苔伴手禮。', location: '남포동', shopping: [
+                    { name: 'BIFF 廣場', items: '街頭小吃一條街，黑糖餅必吃' },
+                    { name: '국제시장 國際市場', items: '生活雜貨、紀念品、伴手禮' },
+                    { name: '부평깡통시장 富平罐頭市場', items: '傳統市場，夜市美食最熱鬧' }
+                ], tips: '南浦洞交通提醒：預計 17:30 出發前往廣安里，週五傍晚記得提早離開！' },
+                { time: '17:30', type: 'transport', name: '🚕 提早出發前往廣安里', isWarn: true, desc: '週五下班塞車，車程預抓 50–60 分鐘。遊艇 19:45，不能遲到！', detail: '🔹⚠ <b>已調整</b>：比原計畫提前30分鐘出發<br>🔹週五傍晚下班車潮，務必 17:30 前離開南浦洞<br>🔹Kakao T 叫 Venti 大車，預計 18:30 前抵達廣安里' },
+                { time: '18:30', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '悠閒用餐，欣賞廣安大橋夕陽，為遊艇做準備。', location: '광안리', restaurants: [
+                    { name: '광안리 바닷가 해산물', dish: '生魚片、海鮮料理', price: '20,000–35,000', queue: '建議稍早入座' },
+                    { name: '광안리 갈비 排骨', dish: '韓式牛排骨', price: '30,000–50,000', queue: '建議預約' }
+                ]},
+                { time: '19:45', type: 'activity', name: '🎆 廣安里煙火遊艇', isPass: true, tag: '需預約', desc: '海上近距離觀賞廣安大橋夜景與週五限定微型煙火！', location: '광안리 유람선', detail: '🔹使用 VISIT BUSAN PASS 搭乘（需事先預約）<br>🔹買好 Pass 後，透過 Pass 官網以 LINE 或 Email 向商家預約 6/26（五）19:45 場次<br>🔹週五限定微型煙火，在海上欣賞廣安大橋夜景', tips: '遊艇為週五限定！出發前請再次確認是否仍有舉辦。入場請提早 15 分鐘抵達碼頭。' },
+                { time: '21:00', type: 'transport', name: '🚕 搭車回海雲台', desc: 'Kakao T 叫車返回 Shilla Stay 飯店，今日行程豐富，好好休息！' }
+            ]
+        },
+        {
+            shortTitle: 'D4 6/27', title: 'Day 4：西面購物 + 廣安里夕陽', subtitle: '動線：飯店 → 西面商圈 → 廣安里 → 飯店',
+            events: [
+                { time: '09:30', type: 'food', name: '😴 悠閒早餐', desc: '長輩今天睡飽，不趕早，悠閒吃早餐再出發。' },
+                { time: '10:30', type: 'transport', name: '🚕 出發前往西面商圈', desc: '車程約 30 分鐘，Kakao T 叫車。', detail: '🔹Kakao T 叫 Venti 大車<br>🔹目的地：서면역 (Seomyeon Station)' },
+                { time: '11:00', type: 'activity', name: '🛍️ 西面商圈 + 地下街', desc: '早上人潮最少，專攻地下街（全平路有冷氣）！', location: '서면', shopping: [
+                    { name: '서면 지하상가 西面地下街', items: '全平路冷氣舒適，服飾、飾品、雜貨' },
+                    { name: 'Olive Young 올리브영', items: '韓國美妝保養，必掃 MEDIHEAL、COSRX' },
+                    { name: 'SPAO', items: '韓系平價服飾，版型好、CP值高' },
+                    { name: '롯데백화점 樂天百貨', items: '長輩累了可在一樓咖啡廳休息' }
+                ], tips: '早上11點人最少，下午後人潮增加。長輩逛累了，樂天百貨一樓有咖啡廳可休息等候。' },
+                { time: '13:30', type: 'food', name: '🍖 午餐：豬肉湯飯', desc: '釜山必吃代表美食！松亭3代豬肉湯飯是在地人的最愛。', location: '돼지국밥', restaurants: [
+                    { name: '송정3대국밥 松亭3代豬肉湯飯', dish: '돼지국밥 豬肉湯飯', price: '9,000–12,000', queue: '中午可能稍候' },
+                    { name: '신창돼지국밥', dish: '豬肉湯飯 + 小菜', price: '9,000–11,000', queue: '即入' }
+                ]},
+                { time: '14:30', type: 'activity', name: '☕ 西面特色咖啡廳', desc: '韓國咖啡廳文化超厲害！在西面找一間打卡咖啡廳休息，或繼續補買戰利品。', location: '서면 카페', tips: '西面有很多 IG 風格咖啡廳，可搜尋「서면 카페추천」找口碑店家。' },
+                { time: '16:00', type: 'transport', name: '🚕 出發前往廣安里', desc: '車程約 20 分鐘。', detail: '🔹Kakao T 叫 Venti 大車<br>🔹目的地：광안리해수욕장' },
+                { time: '16:30', type: 'activity', name: '🌊 廣安里海灘夕陽散步', desc: '避開正中午烈日，在沙灘邊漫步，找一間面海景觀咖啡廳看廣安大橋夕陽。', location: '광안리 해수욕장', tips: '6月釜山氣溫高，建議帶防曬、墨鏡。廣安里沙灘旁有很多咖啡廳，找面海的二樓座位最讚！' },
+                { time: '18:00', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '最後一個廣安里夜晚，好好享用海景晚餐！', location: '광안리', restaurants: [
+                    { name: '광안리 소갈비 牛排骨', dish: '韓式牛排骨 소갈비', price: '35,000–55,000', queue: '建議預約' },
+                    { name: '광안리 삼겹살 五花肉', dish: '烤豬五花 + 燒酒', price: '15,000–25,000', queue: '即入' }
+                ]},
+                { time: '20:00', type: 'transport', name: '🌙 返回海雲台', desc: '散步或叫車返回 Shilla Stay，享受最後一晚的海風。' }
+            ]
+        },
+        {
+            shortTitle: 'D5 6/28', title: 'Day 5：最後採買 + 回程', subtitle: '慢活早晨，從容回台',
+            events: [
+                { time: '09:30', type: 'food', name: '🌅 慢活早餐', desc: '最後一天，悠閒享用早餐。' },
+                { time: '10:30', type: 'activity', name: '🛍️ 海雲台主街最後採買', isWarn: true, desc: '先購物再 Check-out！Olive Young、大創補貨，買完直接回飯店塞行李箱。', location: '해운대 올리브영', shopping: [
+                    { name: 'Olive Young 올리브영 海雲台店', items: 'MEDIHEAL 面膜、COSRX 痘痘貼、氣墊粉底' },
+                    { name: 'Daiso 다이소 大創', items: '韓國限定款、收納小物、泡麵' },
+                    { name: '해운대시장 伴手禮', items: '海苔禮盒、韓國零食、調味料' }
+                ], tips: '⚠ 已調整：先購物10:30，再回飯店 Check-out 12:00，避免同一時間衝突。買完立刻回飯店塞行李，完全不需手提著走。' },
+                { time: '12:00', type: 'hotel', name: '🏨 辦理 Check-out · 行李寄放', desc: '退房，行李寄放飯店櫃檯，等待包車來接。', detail: '🔹Check-out 時間：12:00<br>🔹行李寄放在 Shilla Stay 大廳，出發時再取' },
+                { time: '12:30', type: 'food', name: '🍽️ 午餐：最後一餐', desc: '海雲台特色料理，為釜山之旅畫下完美句點。', location: '해운대', restaurants: [
+                    { name: '동태찌개 大鱈魚湯', dish: '動太찌개 辣鱈魚湯', price: '10,000–15,000', queue: '即入' },
+                    { name: '교촌치킨 橋村炸雞', dish: '韓式炸雞 + 啤酒', price: '18,000–25,000', queue: '即入' }
+                ]},
+                { time: '15:00', type: 'transport', name: '🧳 取行李 → 包車前往金海機場', desc: '搭乘預約好的包車大車直達金海機場，完美避開傍晚通勤車潮！', detail: '🔹包車：KKday / Klook 預約「商務9人車」<br>🔹車程約 35–45 分鐘<br>🔹出發前再次確認機票、護照', isWarn: false },
+                { time: '18:55', type: 'flight', name: '✈️ 搭機回台北', desc: '結束美好的釜山五日遊，帶著滿滿的回憶和戰利品回家！', location: '김해국제공항 Gimhae Airport', tips: '建議提前 2.5–3 小時抵達機場辦理報到。金海機場免稅店可補購最後伴手禮。' }
+            ]
+        }
+    ];
+
+    const defaultPrepData = {
+        ticketsWallet: {
+            '🎫 VISIT BUSAN PASS 48H': '（KKday/Klook 電子票代號）',
+            '🏨 Shilla Stay 海雲台': '（訂位代號待填）• 4晚 6/24–6/28',
+            '🚞 天空膠囊列車': '（Blueline Park 預約編號）6/25 10:00',
+            '🚤 廣安里遊艇': '（以 LINE/Email 預約 6/26 19:45）',
+            '🚗 機場包車去程': '（KKday/Klook 預約代號）',
+            '🚗 機場包車回程': '（KKday/Klook 預約代號）'
+        },
+        tickets: [
+            { name: '機場接送包車（去回）', desc: 'KKday / Klook 商務9人車，5人+5行李', link: 'https://www.kkday.com/zh-tw/product/12013' },
+            { name: 'VISIT BUSAN PASS 48H', desc: 'KKday / Klook 購買電子票', link: 'https://www.kkday.com/zh-tw/product/7598' },
+            { name: '天空膠囊列車預約', desc: 'Blueline Park 官網，6/25 10:00–10:30 尾浦→青沙浦', link: 'https://www.bluelinepark.com/' },
+            { name: 'Skyline Luge 釜山', desc: '使用 VISIT BUSAN PASS 免費入場', link: 'https://www.skylineluge.com/kr/busan/' },
+            { name: 'Spa Land 確認入場時間', desc: '確認 PASS 當天最晚入場時間', link: 'https://www.spaland.co.kr/' },
+            { name: '廣安里煙火遊艇預約', desc: '購買 Pass 後以 LINE/Email 預約 6/26 19:45', link: 'https://www.visitbusan.net/tw/index.do' }
+        ],
+        luggage: {
+            '證件': [
+                { name: '護照（效期6個月以上）', checked: false },
+                { name: '機票 QR Code（截圖備用）', checked: false },
+                { name: '台幣換韓幣 / 信用卡', checked: false },
+                { name: 'T-money 交通卡（或現場購買）', checked: false }
+            ],
+            '電子': [
+                { name: '網卡 / eSIM（韓國用）', checked: false },
+                { name: '行動電源', checked: false },
+                { name: '充電組（韓國 220V / A型）', checked: false },
+                { name: 'Kakao T 叫車 APP 下載', checked: false }
+            ],
+            '生活': [
+                { name: '衣物（5天）', checked: false },
+                { name: '防曬乳（海邊必備）', checked: false },
+                { name: '泳裝（海雲台沙灘）', checked: false },
+                { name: '牙刷 / 常備藥', checked: false },
+                { name: '摺疊雨傘（6月梅雨季）', checked: false }
+            ]
+        },
+        shopping: {
+            '韓國美妝': [
+                { name: 'MEDIHEAL 面膜禮盒', desc: 'Olive Young 必買，親友最愛', checked: false },
+                { name: 'COSRX 痘痘貼', desc: '超好用，台灣貴很多', checked: false },
+                { name: '韓國氣墊粉底', desc: 'Laneige / IOPE / 蘭芝', checked: false },
+                { name: '韓國防曬乳', desc: '質地輕薄好推，CP值高', checked: false }
+            ],
+            '食品伴手禮': [
+                { name: '海苔禮盒 김조림', desc: '釜山最有名的伴手禮', checked: false },
+                { name: '韓國零食禮盒', desc: '蜂蜜奶油薯片、海苔片', checked: false },
+                { name: '大醬醬料組', desc: '正宗韓式豆瓣醬', checked: false },
+                { name: '泡麵（限定款）', checked: false, desc: '大創或超市購買' }
+            ],
+            '其他': [
+                { name: 'Daiso 韓國限定款', desc: '台灣找不到的款式', checked: false },
+                { name: '韓服體驗服飾配件', desc: '甘川洞或景福宮周邊', checked: false }
+            ]
+        }
+    };
+
+    let initialData = defaultPrepData;
+    let initialMoney = [];
+    try {
+        const s = localStorage.getItem('busan_2026_v1');
+        if(s && s !== 'undefined') initialData = JSON.parse(s);
+        const m = localStorage.getItem('busan_2026_money_v1');
+        if(m && m !== 'undefined') initialMoney = JSON.parse(m);
+    } catch(e) { console.error('Data error', e); }
+
+    return {
+        activeIndex: 0, showChatModal: false, showKeySettings: false, swiperInstance: null,
+        apiKey: localStorage.getItem('gemini_api_key') || '',
+        apiKeyTemp: localStorage.getItem('gemini_api_key') || '',
+        chatInput: '', isAiThinking: false,
+        pendingImage: null, pendingImageMime: null, pendingImageBase64: null, showImgMenu: false,
+        modelId: localStorage.getItem('gemini_model_id') || 'gemini-2.5-flash',
+        modelIdTemp: localStorage.getItem('gemini_model_id') || 'gemini-2.5-flash',
+        chatHistory: JSON.parse(localStorage.getItem('busan_chat_history') || '[]'),
+        prepData: initialData, moneyList: initialMoney, days: daysData,
+        weatherData: { busan: { temp: '--', icon: 'ph-sun', desc: '載入中' } },
+        toastText: '', showToast: false, toastLeaving: false,
+        modalOpen: false, showAddModal: false, showMoneyModal: false, showTaxiModal: false,
+        currentPhrase: { kr:'', cn:'', romaji:'', cat:'' }, currentTaxi: { krName:'', address:'' },
+        newItem: { cat: '韓國美妝', name: '', desc: '' },
+        newMoney: { title:'', amount:'', cat:'food' },
+        showEditMoneyModal: false, editMoney: { title:'', amount:'', cat:'food', idx:-1 },
+        showWeatherDetail: false, phraseTab: 'food',
+        simulatedTime: null, activeEventId: null,
+        statusMsg: 'v1 • 2026 韓國釜山 • Made with ❤️',
+
+        phrases: {
+            food: [
+                { kr: '메뉴 주세요', cn: '請給我菜單', romaji: 'Menu juseyo' },
+                { kr: '이것 주세요', cn: '我要點這個', romaji: 'Igeot juseyo' },
+                { kr: '물 주세요', cn: '請給我水', romaji: 'Mul juseyo' },
+                { kr: '맛있어요', cn: '很好吃', romaji: 'Masisseoyo' },
+                { kr: '계산해 주세요', cn: '買單', romaji: 'Gyesan hae juseyo' },
+                { kr: '포장해 주세요', cn: '打包帶走', romaji: 'Pojang hae juseyo' }
+            ],
+            shop: [
+                { kr: '얼마예요?', cn: '多少錢？', romaji: 'Eolmayeyo?' },
+                { kr: '카드 되나요?', cn: '可刷卡嗎？', romaji: 'Kadeu doenayo?' },
+                { kr: '할인 되나요?', cn: '可以打折嗎？', romaji: 'Halin doenayo?' },
+                { kr: '영수증 주세요', cn: '請給我收據', romaji: 'Yeongsujeung juseyo' },
+                { kr: '봉투 주세요', cn: '請給我袋子', romaji: 'Bongtu juseyo' }
+            ],
+            help: [
+                { kr: '역이 어디예요?', cn: '車站在哪裡？', romaji: 'Yeogyui eodieyeyo?' },
+                { kr: '사진 찍어 주세요', cn: '幫我拍照', romaji: 'Sajin jjigo juseyo' },
+                { kr: '도와주세요', cn: '請幫幫我', romaji: 'Dowajuseyo' },
+                { kr: '화장실이 어디예요?', cn: '廁所在哪？', romaji: 'Hwajangsil eodieyeyo?' },
+                { kr: '병원에 가고 싶어요', cn: '我想去醫院', romaji: 'Byeongwon gago sipeoyo' }
+            ]
+        },
+
+        get luggageProgress() {
+            let total = 0, checked = 0;
+            for (const items of Object.values(this.prepData.luggage || {})) { total += items.length; checked += items.filter(i => i.checked).length; }
+            return total === 0 ? 0 : Math.round(checked / total * 100);
+        },
+        get totalSpent() { return this.moneyList.reduce((acc, item) => acc + Number(item.amount), 0); },
+
+        initApp() {
+            this.initWeather();
+            this.startClock();
+            setTimeout(() => {
+                this.swiperInstance = new Swiper('.mySwiper', {
+                    autoHeight: true, spaceBetween: 20, observer: true, observeParents: true, speed: 400,
+                    on: { slideChange: (s) => { this.activeIndex = s.activeIndex; this.centerTab(s.activeIndex); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+                });
+                setTimeout(() => this.autoNavigate(), 800);
+            }, 500);
+            if (!this.prepData || !this.prepData.luggage) { this.resetData(); }
+        },
+
+        centerTab(index) {
+            const container = document.getElementById('tabContainer');
+            const tabBtn = document.getElementById(`tab-${index}`);
+            if (container && tabBtn) { const scrollLeft = tabBtn.offsetLeft - (container.clientWidth / 2) + (tabBtn.clientWidth / 2); container.scrollTo({ left: scrollLeft, behavior: 'smooth' }); }
+        },
+
+        isTodayTab(index) {
+            const now = this.getNow();
+            if (now.getMonth() + 1 !== 6) return false;
+            const dateMap = { 0: 24, 1: 25, 2: 26, 3: 27, 4: 28 };
+            return now.getDate() === dateMap[index];
+        },
+
+        speak(text, lang='ko-KR') {
+            if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 0.9; window.speechSynthesis.speak(u); } else { alert('你的瀏覽器不支援發音'); }
+        },
+
+        openChat() { this.showChatModal = true; this.$nextTick(() => this.scrollToBottom()); },
+        clearChatHistory() { if (confirm('清除所有對話記錄？')) { this.chatHistory = []; localStorage.removeItem('busan_chat_history'); } },
+        quickAsk(text) { this.chatInput = text; this.sendChat(); },
+
+        saveSettings() {
+            this.apiKey = this.apiKeyTemp.trim(); this.modelId = this.modelIdTemp.trim();
+            localStorage.setItem('gemini_api_key', this.apiKey); localStorage.setItem('gemini_model_id', this.modelId);
+            this.showKeySettings = false; this.toast('設定已儲存');
+        },
+
+        handleImageFile(event) {
+            const file = event.target.files[0]; if (!file) return; event.target.value = '';
+            const reader = new FileReader();
+            reader.onload = (e) => { const dataUrl = e.target.result; this.pendingImage = dataUrl; this.pendingImageMime = file.type || 'image/jpeg'; this.pendingImageBase64 = dataUrl.split(',')[1]; };
+            reader.readAsDataURL(file);
+        },
+
+        async sendChat() {
+            const hasText = this.chatInput.trim(), hasImage = !!this.pendingImageBase64;
+            if ((!hasText && !hasImage) || this.isAiThinking) return;
+            const msg = this.chatInput.trim(); this.chatInput = '';
+            if (hasImage) {
+                const imageDataUrl = this.pendingImage, base64 = this.pendingImageBase64, mime = this.pendingImageMime;
+                const userText = msg || '幫我辨識並翻譯這張圖片的文字';
+                const sceneEmoji = userText.includes('菜單')?'🍖':userText.includes('告示')?'🪧':userText.includes('藥')?'💊':'🔍';
+                this.chatHistory.push({ role:'user', content:`<img src="${imageDataUrl}" class="w-full max-h-52 rounded-2xl mb-2 block object-cover shadow-sm"><div class="text-xs font-bold">${sceneEmoji} ${userText}</div>`, time: new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}), isHtml:true });
+                localStorage.setItem('busan_chat_history', JSON.stringify(this.chatHistory));
+                this.$nextTick(() => this.scrollToBottom());
+                this.pendingImage = null; this.pendingImageMime = null; this.pendingImageBase64 = null;
+                await this.performChatWithImage(userText, base64, mime);
+            } else { this.pushMsg('user', msg); await this.performChat(msg); }
+        },
+
+        async performChatWithImage(userText, base64, mime) {
+            if (!this.apiKey) { alert('請先設定 API Key'); this.showKeySettings = true; return; }
+            this.isAiThinking = true;
+            const cleanModelId = this.modelId.replace('models/','');
+            let systemPrompt = `你是旅遊助理「Busan Bot」，幫助台灣旅客在韓國釜山旅遊。請辨識圖片並翻譯所有韓文（韓→繁體中文），給出實用建議。使用者的問題：${userText}`;
+            if (userText.includes('菜單')) systemPrompt = `你是「Busan Bot」。請翻譯菜單所有品項（韓文→繁體中文含價格），推薦3道好吃的，標記過敏原。`;
+            const payload = { contents: [{ parts: [{ text: systemPrompt }, { inline_data: { mime_type: mime, data: base64 } }] }] };
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${cleanModelId}:generateContent?key=${this.apiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                if (!res.ok) throw new Error((await res.json()).error?.message);
+                const data = await res.json();
+                this.pushMsg('ai', data.candidates?.[0]?.content?.parts?.[0]?.text || '抱歉，無法辨識此圖片。');
+            } catch(e) { this.pushMsg('ai', `❌ 圖片辨識失敗：${e.message}`); } finally { this.isAiThinking = false; }
+        },
+
+        async performChat(userMsg) {
+            if (!this.apiKey) { alert('請先設定 API Key'); this.showKeySettings = true; return; }
+            this.isAiThinking = true;
+            const cleanModelId = this.modelId.replace('models/','');
+            const simpleContext = this.days.map(d => `${d.shortTitle}: ` + d.events.map(e=>`${e.time} ${e.name}`).join(', ')).join('\n');
+            const systemInstruction = `你是「Busan Bot」，親切的釜山旅遊助理。行程：\n${simpleContext}\n\n用繁體中文回答，簡潔實用。`;
+            const history = this.chatHistory.slice(0, -1).map(m => ({ role: m.role==='ai'?'model':'user', parts:[{text:m.content}] }));
+            history.push({ role:'user', parts:[{text:userMsg}] });
+            const payload = { system_instruction:{parts:[{text:systemInstruction}]}, contents: history };
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${cleanModelId}:generateContent?key=${this.apiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                if (!res.ok) throw new Error((await res.json()).error?.message);
+                const data = await res.json();
+                this.pushMsg('ai', data.candidates?.[0]?.content?.parts?.[0]?.text || '抱歉，沒有收到回應。');
+            } catch(e) { this.pushMsg('ai', `錯誤: ${e.message}`); } finally { this.isAiThinking = false; }
+        },
+
+        pushMsg(role, content) {
+            this.chatHistory.push({ role, content, time: new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}) });
+            localStorage.setItem('busan_chat_history', JSON.stringify(this.chatHistory));
+            this.$nextTick(() => this.scrollToBottom());
+        },
+        scrollToBottom() { const c = document.getElementById('chatContainer'); if(c) c.scrollTop = c.scrollHeight; },
+        renderMarkdown(text) { try { return marked.parse(text||''); } catch(e) { return text; } },
+
+        toast(t) { this.toastText=t; this.toastLeaving=false; this.showToast=true; setTimeout(()=>{ this.toastLeaving=true; setTimeout(()=>{ this.showToast=false; this.toastLeaving=false; },200); },1800); },
+
+        async initWeather() { await this.fetchW(35.1595, 129.0596, 'busan'); },
+        getWeatherIcon(code) {
+            if (code===0) return 'ph-sun'; if (code<=2) return 'ph-cloud-sun'; if (code<=3) return 'ph-cloud';
+            if (code<=48) return 'ph-cloud-fog'; if (code<=67) return 'ph-cloud-rain'; if (code<=77) return 'ph-snowflake';
+            if (code<=82) return 'ph-cloud-rain'; return 'ph-cloud-lightning';
+        },
+        async fetchW(lat, lon, key) {
+            try {
+                const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=Asia%2FSeoul`);
+                const d = await r.json();
+                const code = d.current?.weather_code ?? 0;
+                const t = Math.round(d.current?.temperature_2m ?? 0);
+                const wind = d.current?.wind_speed_10m ?? 0;
+                this.weatherData[key] = { temp:`${t}°C`, icon:this.getWeatherIcon(code), desc:this.getWeatherDesc(code), outfit:this.getOutfitTip(t,code,wind) };
+            } catch(e) { this.weatherData[key] = { temp:'-', icon:'ph-warning', desc:'離線', outfit:'' }; }
+        },
+        getWeatherDesc(code) {
+            if(code===0)return'晴空萬里'; if(code<=2)return'晴時多雲'; if(code<=3)return'多雲陰天';
+            if(code<=48)return'有霧'; if(code<=57)return'毛毛雨'; if(code<=67)return'有雨';
+            if(code<=77)return'有雪'; if(code<=82)return'陣雨'; return'雷雨';
+        },
+        getOutfitTip(temp, code, wind) {
+            const rainy = code >= 51, windy = wind > 20;
+            let base = '';
+            if(temp<=10) base='厚外套+毛衣'; else if(temp<=15) base='薄外套+長袖'; else if(temp<=20) base='長袖+薄外套';
+            else if(temp<=25) base='長袖即可'; else if(temp<=30) base='短袖+防曬'; else base='短袖+防曬+注意熱浪';
+            if(rainy) base+='・帶傘'; if(windy) base+='・注意風大';
+            return base;
+        },
+        getCurrentWeather() { return { ...this.weatherData.busan, loc: '釜山' }; },
+
+        slideTo(i) { this.swiperInstance?.slideTo(i); },
+        updateSwiperHeight() { setTimeout(()=>{ this.swiperInstance?.updateAutoHeight(300); this.swiperInstance?.update(); },100); },
+        toggleCheck(item) { item.checked = !item.checked; this.saveChecks(); },
+        saveChecks() { try { localStorage.setItem('busan_2026_v1', JSON.stringify(this.prepData)); } catch(e) {} },
+
+        addMoney() {
+            if (!this.newMoney.title.trim()) { this.toast('請輸入項目名稱'); return; }
+            if (!this.newMoney.amount || Number(this.newMoney.amount) <= 0) { this.toast('請輸入正確金額'); return; }
+            this.moneyList.unshift({ title:this.newMoney.title.trim(), amount:this.newMoney.amount, cat:this.newMoney.cat, date:new Date().toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}) });
+            this.saveMoney(); this.newMoney={title:'',amount:'',cat:'food'}; this.showMoneyModal=false;
+            this.$nextTick(()=>this.updateSwiperHeight()); this.toast('✅ 已新增');
+        },
+        saveEditMoney() {
+            if (!this.editMoney.title||!this.editMoney.amount) return;
+            this.moneyList[this.editMoney.idx] = { title:this.editMoney.title, amount:this.editMoney.amount, cat:this.editMoney.cat, date:this.moneyList[this.editMoney.idx].date };
+            this.saveMoney(); this.showEditMoneyModal=false; this.toast('已更新');
+        },
+        confirmDeleteMoney() { this.moneyList.splice(this.editMoney.idx,1); this.saveMoney(); this.showEditMoneyModal=false; this.toast('已刪除'); },
+        deleteMoney(idx) { this.moneyList.splice(idx,1); this.saveMoney(); },
+        resetMoney() { if(confirm('清空所有消費紀錄？')){ this.moneyList=[]; this.saveMoney(); } },
+        saveMoney() { try { localStorage.setItem('busan_2026_money_v1', JSON.stringify(this.moneyList)); this.$nextTick(()=>this.updateSwiperHeight()); } catch(e){} },
+
+        getCatTotal(cat) { return this.moneyList.filter(i=>i.cat===cat).reduce((s,i)=>s+Number(i.amount),0); },
+        getCatLabel(cat) { return {food:'飲食',shop:'購物',traffic:'交通',other:'其他'}[cat]||cat; },
+        getMoneyIcon(cat) { const map = {food:{icon:'ph-bowl-food',bg:'bg-orange-100 text-orange-600'},shop:{icon:'ph-shopping-bag',bg:'bg-pink-100 text-pink-600'},traffic:{icon:'ph-taxi',bg:'bg-blue-100 text-blue-600'},other:{icon:'ph-dots-three-circle',bg:'bg-gray-100 text-gray-600'}}; return map[cat]||map['other']; },
+
+        exportShopping() {
+            let text='🛍️ 釜山戰利品清單\n';
+            for (const [cat,items] of Object.entries(this.prepData.shopping)) { if(items.length>0){ text+=`\n【${cat}】\n`; items.forEach(item=>{text+=`${item.checked?'✅':'⬜'} ${item.name} ${item.desc?'('+item.desc+')':''}\n`;}); } }
+            this.copyToClipboard(text);
+        },
+        exportMoney() {
+            let text='💸 釜山消費紀錄\n'; text+=`📅 日期: ${new Date().toLocaleDateString()}\n`; text+=`💰 總支出: ₩${this.totalSpent.toLocaleString()}\n------------------\n`;
+            this.moneyList.forEach(item=>{text+=`${item.date} | ${item.title}: ₩${Number(item.amount).toLocaleString()}\n`;}); this.copyToClipboard(text);
+        },
+        copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(()=>this.toast('已複製到剪貼板')); }
+            else { let ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); try{document.execCommand('copy');this.toast('已複製');}catch(err){} document.body.removeChild(ta); }
+        },
+        resetData() { if(confirm('重置打包清單？')){ this.prepData=JSON.parse(JSON.stringify(defaultPrepData)); this.saveChecks(); } },
+
+        openAddModal() { this.newItem={cat:'韓國美妝',name:'',desc:''}; this.showAddModal=true; },
+        addItem() { if(!this.newItem.name.trim())return; this.prepData.shopping[this.newItem.cat].push({name:this.newItem.name,desc:this.newItem.desc||'',checked:false}); this.saveChecks(); this.showAddModal=false; this.toast('已新增'); },
+        deleteItem(cat,idx) { if(confirm('刪除此項目？')){ this.prepData.shopping[cat].splice(idx,1); this.saveChecks(); } },
+        openTaxi(event) { if(event.taxi){ this.currentTaxi=event.taxi; this.showTaxiModal=true; } },
+        openPhrase(p,catName) { const catMap={food:'餐廳',shop:'購物',help:'緊急'}; this.currentPhrase={...p,cat:catMap[catName]}; this.modalOpen=true; },
+
+        startClock() { this.checkActiveEvent(); setInterval(()=>this.checkActiveEvent(),60000); },
+        getNow() { return this.simulatedTime || new Date(); },
+
+        checkActiveEvent() {
+            const now = this.getNow();
+            if (now.getMonth()+1 !== 6) { this.activeEventId=null; return; }
+            const dateMap = {24:0,25:1,26:2,27:3,28:4};
+            const dayIndex = dateMap[now.getDate()];
+            if (dayIndex===undefined) { this.activeEventId=null; return; }
+            const todayEvents = this.days[dayIndex].events;
+            const nowMins = now.getHours()*60+now.getMinutes();
+            let foundIdx = -1;
+            todayEvents.forEach((ev,idx)=>{ const [h,m]=ev.time.split(':').map(Number); if(nowMins>=h*60+m) foundIdx=idx; });
+            this.activeEventId = foundIdx>=0 ? `event-${dayIndex}-${foundIdx}` : null;
+        },
+
+        isCurrentEvent(dayIndex, event) {
+            if (!this.activeEventId) return false;
+            const now = this.getNow();
+            if (now.getMonth()+1!==6) return false;
+            const dateMap = {24:0,25:1,26:2,27:3,28:4};
+            if (dateMap[now.getDate()]!==dayIndex) return false;
+            const events = this.days[dayIndex].events;
+            const eventIdx = events.findIndex(e=>e.time===event.time&&e.name===event.name);
+            return this.activeEventId===`event-${dayIndex}-${eventIdx}`;
+        },
+
+        autoNavigate() {
+            if (this.activeEventId) { const parts=this.activeEventId.split('-'); const dayIdx=parseInt(parts[1]); const targetSlide=dayIdx+3; this.activeIndex=targetSlide; this.swiperInstance?.slideTo(targetSlide,0); this.centerTab(targetSlide); }
+        },
+
+        getIconColor(t) { const c={transport:'bg-blue-500',food:'bg-orange-400',activity:'bg-slate-700',hotel:'bg-indigo-500',flight:'bg-sky-500',train:'bg-teal-500'}; return c[t]||'bg-slate-400'; },
+        getIconClass(t) { const i={transport:'ph-bold ph-taxi',food:'ph-bold ph-bowl-food',activity:'ph-bold ph-camera',hotel:'ph-bold ph-bed',flight:'ph-bold ph-airplane-tilt',train:'ph-bold ph-train'}; return i[t]||'ph-circle'; },
+        getTagColor(t) { if(t==='需預約')return'bg-red-100 text-red-600'; if(t==='必吃')return'bg-orange-100 text-orange-600'; return'bg-blue-100 text-blue-600'; }
+    };
+}
+</script>
+</body>
+</html>
