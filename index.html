@@ -19,72 +19,52 @@
 
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #F2F2F7; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior-y: none; }
-
         .glass-nav { background: rgba(255,255,255,0.98); border-bottom: 1px solid rgba(0,0,0,0.05); padding-top: calc(env(safe-area-inset-top) + 20px); padding-bottom: 10px; position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
         main { padding-top: calc(env(safe-area-inset-top) + 180px); padding-bottom: 100px; min-height: 100vh; }
-
         .ios-card { background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; margin-bottom: 20px; transition: transform 0.2s; }
         .ios-card:active { transform: scale(0.995); }
-
         .swiper { width: 100%; height: auto; }
         .swiper-slide { height: auto; }
-
         .tab-btn { transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1); white-space: nowrap; border-radius: 9999px; padding: 8px 16px; font-size: 13px; font-weight: bold; scroll-snap-align: center; }
         .tab-active { background-color: #3B82F6; color: white; transform: scale(1.05); box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
         .tab-inactive { background-color: white; color: #8E8E93; border: 1px solid #F2F2F7; }
-
         .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; }
         .chat-user { background: #3B82F6; color: white; border-bottom-right-radius: 4px; align-self: flex-end; margin-left: auto; }
         .chat-ai { background: #F3F4F6; color: #1F2937; border-bottom-left-radius: 4px; align-self: flex-start; margin-right: auto; }
         .typing-dot { display: inline-block; width: 6px; height: 6px; background-color: #9CA3AF; border-radius: 50%; animation: typing 1.4s infinite; margin: 0 2px; }
         @keyframes typing { 0%,80%,100% { transform: scale(0); } 40% { transform: scale(1); } }
-
         .timeline-line { position: absolute; left: 24px; top: 10px; bottom: -10px; width: 2px; background: #E5E5EA; z-index: 0; }
         .expand-content { transition: all 0.3s ease-out; max-height: 0; opacity: 0; overflow: hidden; }
         .expanded { max-height: 2000px; opacity: 1; }
         .check-circle { transition: all 0.2s; }
         .checked-bg { background-color: #34C759; border-color: #34C759; }
-
         @keyframes pulse-blue { 0%,100% { border-color: #60A5FA; box-shadow: 0 0 0 0 rgba(96,165,250,0.7); } 50% { border-color: #3B82F6; box-shadow: 0 0 0 4px rgba(96,165,250,0); } }
         .active-event-card { border-left: 4px solid #3B82F6; animation: pulse-blue 2s infinite; background: #EFF6FF; }
-
         @keyframes toast-in { from { opacity: 0; transform: translateY(-12px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
         .toast-enter { animation: toast-in 0.25s cubic-bezier(0.34,1.56,0.64,1) forwards; }
         .toast-leave { animation: toast-out 0.2s ease-in forwards; }
-
         .money-bar-food { background: #FB923C; }
         .money-bar-shop { background: #F472B6; }
         .money-bar-traffic { background: #60A5FA; }
         .money-bar-other { background: #94A3B8; }
-
         @keyframes live-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
         .live-dot { animation: live-dot 1.5s ease-in-out infinite; }
-
         [x-cloak] { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
         .money-item-card { background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.15s, box-shadow 0.15s; user-select: none; -webkit-user-select: none; }
-
-        .warn-card { background: #FFF7ED; border-left: 3px solid #F97316; }
-        .info-card { background: #EFF6FF; border-left: 3px solid #3B82F6; }
         .pass-badge { background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
         .warn-badge { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
+        .confirm-badge { background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
     </style>
 </head>
 <body class="text-slate-700" x-data="tripData()" x-init="initApp()">
 
-    <!-- Toast -->
-    <div x-show="showToast" x-cloak
-         :class="toastLeaving ? 'toast-leave' : 'toast-enter'"
-         class="fixed right-4 z-[9999] bg-black/75 text-white px-4 py-2.5 rounded-full text-xs font-bold backdrop-blur-md flex items-center gap-2"
-         style="top: calc(env(safe-area-inset-top) + 20px);">
-        <i class="ph-bold ph-check-circle text-green-400"></i>
-        <span x-text="toastText"></span>
+    <div x-show="showToast" x-cloak :class="toastLeaving ? 'toast-leave' : 'toast-enter'" class="fixed right-4 z-[9999] bg-black/75 text-white px-4 py-2.5 rounded-full text-xs font-bold backdrop-blur-md flex items-center gap-2" style="top: calc(env(safe-area-inset-top) + 20px);">
+        <i class="ph-bold ph-check-circle text-green-400"></i><span x-text="toastText"></span>
     </div>
 
-    <!-- AI 浮動按鈕 -->
     <button @click="openChat()" class="fixed bottom-6 right-6 z-[5000] w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-white active:scale-90 transition-transform border-4 border-white/20">
         <i class="ph-fill ph-robot text-2xl"></i>
         <div x-show="!apiKey" class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-bounce"></div>
@@ -104,31 +84,26 @@
                     <button @click="showChatModal = false" class="p-2 text-slate-400"><i class="ph-bold ph-x"></i></button>
                 </div>
             </div>
-
             <div x-show="showKeySettings || !apiKey" class="bg-slate-100 p-4 border-b border-slate-200 overflow-y-auto" style="max-height:50vh">
                 <label class="text-xs font-bold text-slate-500 mb-1 block">Google Gemini API Key</label>
                 <input type="text" x-model="apiKeyTemp" placeholder="AIza..." class="w-full rounded-lg border border-slate-300 p-2 text-xs mb-3 bg-white outline-none">
                 <label class="text-xs font-bold text-slate-500 mb-1 block">模型選擇</label>
                 <div class="grid grid-cols-1 gap-1.5 mb-3">
                     <button @click="modelIdTemp='gemini-2.5-flash'; saveSettings()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left" :class="modelId==='gemini-2.5-flash'?'border-indigo-400 bg-indigo-50':'border-slate-200 bg-white'">
-                        <span class="text-lg">⚡</span>
-                        <div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Flash <span class="text-[10px] text-indigo-500 font-bold ml-1">推薦</span></div><div class="text-[10px] text-slate-400">快速 • 圖片辨識 • 250次/天</div></div>
+                        <span class="text-lg">⚡</span><div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Flash <span class="text-[10px] text-indigo-500 font-bold ml-1">推薦</span></div><div class="text-[10px] text-slate-400">快速 • 圖片辨識 • 250次/天</div></div>
                         <i x-show="modelId==='gemini-2.5-flash'" class="ph-fill ph-check-circle text-indigo-500"></i>
                     </button>
                     <button @click="modelIdTemp='gemini-2.5-pro'; saveSettings()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left" :class="modelId==='gemini-2.5-pro'?'border-indigo-400 bg-indigo-50':'border-slate-200 bg-white'">
-                        <span class="text-lg">🧠</span>
-                        <div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Pro</div><div class="text-[10px] text-slate-400">最強推理 • 100次/天</div></div>
+                        <span class="text-lg">🧠</span><div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Pro</div><div class="text-[10px] text-slate-400">最強推理 • 100次/天</div></div>
                         <i x-show="modelId==='gemini-2.5-pro'" class="ph-fill ph-check-circle text-indigo-500"></i>
                     </button>
                     <button @click="modelIdTemp='gemini-2.5-flash-lite'; saveSettings()" class="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left" :class="modelId==='gemini-2.5-flash-lite'?'border-indigo-400 bg-indigo-50':'border-slate-200 bg-white'">
-                        <span class="text-lg">🪶</span>
-                        <div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Flash Lite</div><div class="text-[10px] text-slate-400">省額度 • 1000次/天</div></div>
+                        <span class="text-lg">🪶</span><div class="flex-1 min-w-0"><div class="text-xs font-bold text-slate-800">2.5 Flash Lite</div><div class="text-[10px] text-slate-400">省額度 • 1000次/天</div></div>
                         <i x-show="modelId==='gemini-2.5-flash-lite'" class="ph-fill ph-check-circle text-indigo-500"></i>
                     </button>
                 </div>
                 <button @click="saveSettings()" class="bg-indigo-500 text-white text-xs font-bold px-3 py-3 rounded-lg w-full active:scale-95 transition-transform shadow-md">儲存設定</button>
             </div>
-
             <div class="flex-1 overflow-y-auto p-4 bg-white flex flex-col" id="chatContainer">
                 <div class="flex-1 space-y-4 min-h-[100px]">
                     <div x-show="chatHistory.length===0" class="text-center text-slate-400 text-sm mt-6 space-y-3 px-4">
@@ -149,21 +124,15 @@
                         </div>
                     </template>
                     <div x-show="isAiThinking" class="chat-bubble chat-ai w-16 flex items-center justify-center">
-                        <div class="typing-dot" style="animation-delay:0s"></div>
-                        <div class="typing-dot" style="animation-delay:0.2s"></div>
-                        <div class="typing-dot" style="animation-delay:0.4s"></div>
+                        <div class="typing-dot" style="animation-delay:0s"></div><div class="typing-dot" style="animation-delay:0.2s"></div><div class="typing-dot" style="animation-delay:0.4s"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- 快速提問 -->
             <div class="px-3 pt-2 flex gap-2 overflow-x-auto no-scrollbar">
                 <button @click="quickAsk('今天行程有什麼重點注意事項？')" class="flex-shrink-0 text-[10px] bg-blue-50 text-blue-600 font-bold px-3 py-1.5 rounded-full border border-blue-100 active:scale-95 transition-transform">📋 今日重點</button>
                 <button @click="quickAsk('附近有什麼推薦的韓國料理？')" class="flex-shrink-0 text-[10px] bg-orange-50 text-orange-600 font-bold px-3 py-1.5 rounded-full border border-orange-100 active:scale-95 transition-transform">🍖 附近美食</button>
                 <button @click="quickAsk('Kakao T 怎麼叫車？給我步驟')" class="flex-shrink-0 text-[10px] bg-yellow-50 text-yellow-600 font-bold px-3 py-1.5 rounded-full border border-yellow-100 active:scale-95 transition-transform">🚕 叫車教學</button>
             </div>
-
-            <!-- 圖片預覽區 -->
             <div x-show="pendingImage" class="px-3 pt-2">
                 <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3">
                     <div class="flex gap-3 mb-3">
@@ -190,8 +159,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 輸入列 -->
             <div class="p-3 bg-slate-50 border-t border-slate-100 flex gap-2 mt-1 items-end">
                 <input type="file" id="chatImageUpload" accept="image/*" class="hidden" @change="handleImageFile($event)">
                 <input type="file" id="chatCameraCapture" accept="image/*" capture="environment" class="hidden" @change="handleImageFile($event)">
@@ -212,7 +179,6 @@
         </div>
     </div>
 
-    <!-- Header -->
     <header class="glass-nav">
         <div class="px-4">
             <div class="flex justify-between items-center mb-4">
@@ -228,8 +194,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 天氣展開 -->
             <div x-show="showWeatherDetail" x-cloak class="bg-sky-50 border border-sky-100 rounded-2xl px-4 py-3 mb-3 flex items-start gap-3" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
                 <i :class="getCurrentWeather().icon+' text-2xl text-sky-500 flex-shrink-0 mt-0.5'"></i>
                 <div class="flex-1">
@@ -237,8 +201,6 @@
                     <div class="flex items-center gap-1.5 text-xs text-sky-700 font-bold bg-sky-100 rounded-xl px-3 py-1.5"><i class="ph-fill ph-t-shirt text-sm"></i><span x-text="getCurrentWeather().outfit||'天氣資料載入中...'"></span></div>
                 </div>
             </div>
-
-            <!-- Tabs -->
             <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2" id="tabContainer">
                 <button @click="slideTo(0)" id="tab-0" class="tab-btn flex-shrink-0" :class="activeIndex===0?'tab-active':'tab-inactive'">行前</button>
                 <button @click="slideTo(1)" id="tab-1" class="tab-btn flex-shrink-0" :class="activeIndex===1?'tab-active':'tab-inactive'">資訊</button>
@@ -268,7 +230,6 @@
                             </div>
                         </template>
                     </div>
-
                     <div class="flex justify-between items-center mb-3 ml-1">
                         <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">出發前檢查</h3>
                         <button @click="resetData()" class="text-[10px] text-slate-400 underline">重置清單</button>
@@ -290,7 +251,6 @@
                             </div>
                         </template>
                     </div>
-
                     <div class="flex justify-between items-end mb-3 ml-1">
                         <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider">🛍️ 必買戰利品清單</h3>
                         <div class="flex gap-2">
@@ -318,51 +278,49 @@
 
                 <!-- Slide 1: 資訊 -->
                 <div class="swiper-slide px-4 pb-6">
-                    <!-- 票券收納 -->
                     <div class="ios-card p-4 mb-6 bg-slate-800 text-white">
                         <div class="flex items-center gap-2 mb-4"><i class="ph-fill ph-ticket text-yellow-400 text-xl"></i><h3 class="font-bold">票券收納夾</h3></div>
                         <div class="space-y-3">
                             <template x-for="(val,key) in prepData.ticketsWallet">
                                 <div class="bg-slate-700/50 rounded-xl p-3 flex justify-between items-center">
-                                    <div class="flex-1 mr-2">
-                                        <div class="text-[10px] text-slate-400 uppercase font-bold" x-text="key"></div>
-                                        <input type="text" x-model="prepData.ticketsWallet[key]" @change="saveChecks()" placeholder="輸入代號或說明..." class="bg-transparent w-full text-sm font-mono font-bold outline-none text-white placeholder-slate-600">
-                                    </div>
+                                    <div class="flex-1 mr-2"><div class="text-[10px] text-slate-400 uppercase font-bold" x-text="key"></div>
+                                        <input type="text" x-model="prepData.ticketsWallet[key]" @change="saveChecks()" placeholder="輸入代號或說明..." class="bg-transparent w-full text-sm font-mono font-bold outline-none text-white placeholder-slate-600"></div>
                                     <button @click="copyToClipboard(prepData.ticketsWallet[key])" class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center active:scale-95"><i class="ph-bold ph-copy text-slate-300"></i></button>
                                 </div>
                             </template>
                         </div>
                     </div>
 
-                    <!-- VISIT BUSAN PASS 說明卡 -->
                     <div class="ios-card p-4 mb-6 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0"><i class="ph-fill ph-ticket text-xl"></i></div>
-                            <div><div class="font-black text-lg">VISIT BUSAN PASS</div><div class="text-xs opacity-80">48H 景點通票 • DAY2 13:30 啟用</div></div>
+                            <div><div class="font-black text-lg">VISIT BUSAN PASS</div><div class="text-xs opacity-80">48H 景點通票 • DAY2 09:30 啟用</div></div>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="bg-white/15 rounded-xl p-2.5"><div class="font-bold mb-1">✅ 免費景點</div><div class="opacity-90 leading-5">海岸列車<br>Skyline Luge<br>Spa Land<br>BUSAN X the Sky<br>松島纜車<br>廣安里遊艇</div></div>
-                            <div class="bg-white/15 rounded-xl p-2.5"><div class="font-bold mb-1">📋 使用注意</div><div class="opacity-90 leading-5">48H 從首次刷卡起算<br>遊艇需提前預約<br>Spa Land 確認入場時間<br>海岸列車需現場換票</div></div>
+                            <div class="bg-white/15 rounded-xl p-2.5"><div class="font-bold mb-1">✅ 免費景點</div><div class="opacity-90 leading-5">海岸列車<br>Skyline Luge<br>Spa Land<br>BUSAN X the Sky<br>松島纜車</div></div>
+                            <div class="bg-white/15 rounded-xl p-2.5"><div class="font-bold mb-1">📋 使用注意</div><div class="opacity-90 leading-5">48H 從首次刷卡起算<br>DAY2 09:30 → DAY4 09:30<br>遊艇為 Klook 自購<br>不含在 PASS 內</div></div>
                         </div>
                     </div>
 
-                    <!-- 實用連結 -->
                     <div class="grid grid-cols-2 gap-3 mb-6">
-                        <a href="https://www.kakaocorp.com/page/service/service/KakaoT" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
-                            <i class="ph-duotone ph-taxi text-2xl text-yellow-500 mb-1"></i><span class="text-xs font-bold text-slate-700">Kakao T 叫車</span>
-                        </a>
-                        <a href="https://www.visitbusan.net/tw/index.do" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
-                            <i class="ph-duotone ph-map-trifold text-2xl text-blue-500 mb-1"></i><span class="text-xs font-bold text-slate-700">釜山旅遊官網</span>
-                        </a>
-                        <a href="https://www.lottedfs.com/tw" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
-                            <i class="ph-duotone ph-shopping-bag text-2xl text-pink-500 mb-1"></i><span class="text-xs font-bold text-slate-700">樂天免稅店</span>
-                        </a>
-                        <a href="https://papago.naver.com/" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform">
-                            <i class="ph-duotone ph-translate text-2xl text-green-500 mb-1"></i><span class="text-xs font-bold text-slate-700">Papago 翻譯</span>
-                        </a>
+                        <a href="https://www.kakaocorp.com/page/service/service/KakaoT" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform"><i class="ph-duotone ph-taxi text-2xl text-yellow-500 mb-1"></i><span class="text-xs font-bold text-slate-700">Kakao T 叫車</span></a>
+                        <a href="https://www.visitbusan.net/tw/index.do" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform"><i class="ph-duotone ph-map-trifold text-2xl text-blue-500 mb-1"></i><span class="text-xs font-bold text-slate-700">釜山旅遊官網</span></a>
+                        <a href="https://www.lottedfs.com/tw" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform"><i class="ph-duotone ph-shopping-bag text-2xl text-pink-500 mb-1"></i><span class="text-xs font-bold text-slate-700">樂天免稅店</span></a>
+                        <a href="https://papago.naver.com/" target="_blank" class="ios-card p-3 flex flex-col items-center justify-center text-center active:scale-95 transition-transform"><i class="ph-duotone ph-translate text-2xl text-green-500 mb-1"></i><span class="text-xs font-bold text-slate-700">Papago 翻譯</span></a>
                     </div>
 
-                    <!-- 手指韓文 -->
+                    <!-- 計程車防坑提醒卡 -->
+                    <div class="ios-card p-4 mb-6 border border-yellow-200 bg-gradient-to-br from-yellow-50 to-white">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center flex-shrink-0 shadow-sm"><i class="ph-fill ph-taxi text-white text-xl"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-slate-800 text-sm mb-1">🚕 搭計程車防坑提醒</h3>
+                                <p class="text-[11px] text-slate-500 leading-relaxed mb-2">部分計程車可能繞路或亂收費。下車前<b class="text-yellow-700">務必索取收據（영수증）</b>，上面有車號與車資，方便事後申訴。建議優先用 Kakao T 叫車（跳表透明）。</p>
+                                <button @click="openTaxiReceipt()" class="text-xs font-bold text-black bg-yellow-400 px-3 py-2 rounded-lg flex items-center gap-2 active:scale-95 transition-transform"><i class="ph-bold ph-receipt"></i> 索取收據韓語字卡 + 語音</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="ios-card p-4 mb-4">
                         <div class="flex items-center gap-2 mb-4">
                             <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><i class="ph-fill ph-translate"></i></div>
@@ -371,6 +329,7 @@
                         <div class="flex bg-slate-100 rounded-lg p-1 mb-4">
                             <button @click="phraseTab='food'" class="flex-1 py-1.5 rounded-md text-xs font-bold transition-all" :class="phraseTab==='food'?'bg-white shadow text-slate-800':'text-slate-400'">餐廳</button>
                             <button @click="phraseTab='shop'" class="flex-1 py-1.5 rounded-md text-xs font-bold transition-all" :class="phraseTab==='shop'?'bg-white shadow text-slate-800':'text-slate-400'">購物</button>
+                            <button @click="phraseTab='taxi'" class="flex-1 py-1.5 rounded-md text-xs font-bold transition-all" :class="phraseTab==='taxi'?'bg-white shadow text-yellow-600':'text-slate-400'">計程車</button>
                             <button @click="phraseTab='help'" class="flex-1 py-1.5 rounded-md text-xs font-bold transition-all" :class="phraseTab==='help'?'bg-white shadow text-red-500':'text-slate-400'">緊急</button>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
@@ -383,14 +342,10 @@
                         </div>
                     </div>
 
-                    <!-- 即時翻譯 -->
                     <div class="ios-card p-4 mb-4" x-data="translatorWidget()">
                         <div class="flex items-center gap-2 mb-4">
                             <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-500 flex-shrink-0"><i class="ph-fill ph-waveform"></i></div>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-slate-800">即時翻譯</h3>
-                                <p class="text-[10px] text-slate-400">語音輸入 • 自動翻譯 • 朗讀給對方聽</p>
-                            </div>
+                            <div class="flex-1"><h3 class="font-bold text-slate-800">即時翻譯</h3><p class="text-[10px] text-slate-400">語音輸入 • 自動翻譯 • 朗讀給對方聽</p></div>
                             <div class="flex bg-slate-100 rounded-lg p-0.5">
                                 <button @click="sourceLang='zh'; originalText=''; translatedText='';" class="px-2.5 py-1 rounded-md text-xs font-bold transition-all" :class="sourceLang==='zh'?'bg-white shadow text-violet-600':'text-slate-400'">中→韓</button>
                                 <button @click="sourceLang='ko'; originalText=''; translatedText='';" class="px-2.5 py-1 rounded-md text-xs font-bold transition-all" :class="sourceLang==='ko'?'bg-white shadow text-violet-600':'text-slate-400'">韓→中</button>
@@ -419,8 +374,7 @@
                                 <div class="text-2xl font-bold text-slate-800 leading-snug mb-3" x-text="translatedText"></div>
                                 <div class="flex gap-2">
                                     <button @click="speakTranslation()" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold active:scale-95 transition-all shadow-sm text-white" :class="isSpeaking?'bg-violet-400':(sourceLang==='zh'?'bg-red-500':'bg-sky-500')">
-                                        <i class="ph-fill text-lg" :class="isSpeaking?'ph-speaker-high animate-pulse':'ph-speaker-high'"></i>
-                                        <span x-text="isSpeaking?'播放中...':'🔊 朗讀給對方聽'"></span>
+                                        <i class="ph-fill text-lg" :class="isSpeaking?'ph-speaker-high animate-pulse':'ph-speaker-high'"></i><span x-text="isSpeaking?'播放中...':'🔊 朗讀給對方聽'"></span>
                                     </button>
                                     <button @click="copyToClipboard(translatedText)" class="w-12 flex items-center justify-center rounded-xl bg-slate-100 text-slate-500 active:scale-95 transition-transform flex-shrink-0"><i class="ph-bold ph-copy"></i></button>
                                 </div>
@@ -480,16 +434,13 @@
                                 <div x-show="day.passDay" class="bg-green-50 px-3 py-1 rounded-full text-xs font-bold text-green-700 flex items-center gap-1"><i class="ph-fill ph-ticket text-green-500"></i><span x-text="day.passDay"></span></div>
                             </div>
                         </div>
-
                         <div class="relative pl-4">
                             <div class="timeline-line"></div>
                             <div class="space-y-6">
                                 <template x-for="(event,eIdx) in day.events" :key="event.time+eIdx">
                                     <div class="relative pl-10" :id="'event-'+index+'-'+eIdx" x-data="{expanded:false}">
                                         <div class="absolute left-0 top-0 flex flex-col items-center z-10">
-                                            <div class="w-12 h-12 rounded-full border-4 border-[#F2F2F7] flex items-center justify-center shadow-sm" :class="getIconColor(event.type)">
-                                                <i :class="getIconClass(event.type)+' text-white text-lg'"></i>
-                                            </div>
+                                            <div class="w-12 h-12 rounded-full border-4 border-[#F2F2F7] flex items-center justify-center shadow-sm" :class="getIconColor(event.type)"><i :class="getIconClass(event.type)+' text-white text-lg'"></i></div>
                                         </div>
                                         <div class="ios-card overflow-hidden transition-all duration-500" :class="{'active-event-card':isCurrentEvent(index,event)}">
                                             <div class="p-4" @click="expanded=!expanded; $nextTick(()=>updateSwiperHeight())">
@@ -498,6 +449,7 @@
                                                         <span class="text-xs font-black text-slate-300 bg-slate-50 px-1.5 py-0.5 rounded font-mono" :class="{'text-blue-500 bg-blue-50':isCurrentEvent(index,event)}" x-text="event.time"></span>
                                                         <template x-if="isCurrentEvent(index,event)"><span class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">進行中 NOW</span></template>
                                                         <template x-if="event.isPass"><span class="pass-badge">PASS</span></template>
+                                                        <template x-if="event.isConfirmed"><span class="confirm-badge">✓ 已預約</span></template>
                                                         <template x-if="event.isWarn"><span class="warn-badge">⚠ 注意</span></template>
                                                     </div>
                                                     <template x-if="event.tag"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" :class="getTagColor(event.tag)" x-text="event.tag"></span></template>
@@ -590,7 +542,28 @@
         </div>
     </div>
 
-    <!-- Taxi Modal -->
+    <!-- 計程車收據 Modal -->
+    <div x-show="showTaxiReceiptModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6" @click.self="showTaxiReceiptModal=false">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl relative">
+            <button @click="showTaxiReceiptModal=false" class="absolute top-4 right-4 bg-gray-100 p-2 rounded-full"><i class="ph-bold ph-x text-lg"></i></button>
+            <div class="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-bold mb-3">🚕 索取收據</div>
+            <p class="text-slate-400 text-xs mb-4">下車前出示這句給司機看，並按下方播放</p>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2 leading-tight">영수증 주세요</h2>
+            <p class="text-slate-400 text-sm font-mono mb-4">Yeong-su-jeung ju-se-yo</p>
+            <div class="border-t pt-4 mb-4"><p class="text-xl font-bold text-slate-600">請給我收據</p></div>
+            <button @click="speak('영수증 주세요','ko-KR')" class="w-full bg-yellow-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md mb-3"><i class="ph-fill ph-speaker-high text-xl"></i> 🔊 唸給司機聽</button>
+            <div class="bg-slate-50 rounded-xl p-3 text-left text-xs text-slate-500 leading-relaxed">
+                <div class="font-bold text-slate-700 mb-1">💡 相關用語</div>
+                <div class="space-y-1.5 mt-2">
+                    <div class="flex justify-between items-center"><span>請跳表 <b class="text-slate-700">미터기로 가주세요</b></span><button @click="speak('미터기로 가주세요','ko-KR')" class="text-yellow-600"><i class="ph-fill ph-speaker-high"></i></button></div>
+                    <div class="flex justify-between items-center"><span>請走最短路線 <b class="text-slate-700">최단 거리로 가주세요</b></span><button @click="speak('최단 거리로 가주세요','ko-KR')" class="text-yellow-600"><i class="ph-fill ph-speaker-high"></i></button></div>
+                    <div class="flex justify-between items-center"><span>多少錢？ <b class="text-slate-700">얼마예요?</b></span><button @click="speak('얼마예요?','ko-KR')" class="text-yellow-600"><i class="ph-fill ph-speaker-high"></i></button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taxi Card Modal -->
     <div x-show="showTaxiModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" @click.self="showTaxiModal=false">
         <div class="bg-white w-full h-auto max-w-md rounded-3xl p-8 text-center shadow-2xl relative">
             <button @click="showTaxiModal=false" class="absolute top-6 right-6 bg-gray-100 p-3 rounded-full"><i class="ph-bold ph-x text-xl"></i></button>
@@ -598,8 +571,12 @@
             <div class="space-y-6">
                 <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100"><p class="text-xs text-slate-400 mb-1">給司機的話：</p><p class="text-lg font-bold text-slate-800">여기까지 가주세요.</p></div>
                 <div><p class="text-xs text-slate-400 mb-2">目的地</p><h2 class="text-3xl font-black text-slate-900 leading-tight mb-4" x-text="currentTaxi.krName"></h2><div class="bg-slate-100 p-4 rounded-xl"><p class="text-lg font-bold text-slate-700 font-mono" x-text="currentTaxi.address"></p></div></div>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 flex items-center justify-between">
+                    <div class="text-left"><p class="text-[10px] text-yellow-700 font-bold">下車前記得索取收據</p><p class="text-base font-bold text-slate-800">영수증 주세요</p></div>
+                    <button @click="speak('영수증 주세요','ko-KR')" class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center active:scale-90 transition-transform"><i class="ph-fill ph-speaker-high text-black"></i></button>
+                </div>
             </div>
-            <button @click="speak(currentTaxi.address,'ko-KR')" class="mt-8 w-full bg-yellow-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md"><i class="ph-fill ph-speaker-high text-xl"></i> 唸出地址</button>
+            <button @click="speak(currentTaxi.address,'ko-KR')" class="mt-6 w-full bg-yellow-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md"><i class="ph-fill ph-speaker-high text-xl"></i> 唸出地址</button>
         </div>
     </div>
 
@@ -662,10 +639,8 @@
 <script>
 function translatorWidget() {
     return {
-        sourceLang: 'zh', isRecording: false, isTranslating: false,
-        originalText: '', translatedText: '',
-        speechSupported: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
-        recognition: null, isSpeaking: false,
+        sourceLang: 'zh', isRecording: false, isTranslating: false, originalText: '', translatedText: '',
+        speechSupported: !!(window.SpeechRecognition || window.webkitSpeechRecognition), recognition: null, isSpeaking: false,
         init() { this.speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
         toggleRecording() { if (!this.speechSupported) return; this.isRecording ? this.stopRecording() : this.startRecording(); },
         startRecording() {
@@ -697,8 +672,7 @@ function translatorWidget() {
             const utter = new SpeechSynthesisUtterance(this.translatedText);
             utter.lang = this.sourceLang === 'zh' ? 'ko-KR' : 'zh-TW';
             utter.rate = 0.9; this.isSpeaking = true;
-            utter.onend = () => { this.isSpeaking = false; };
-            utter.onerror = () => { this.isSpeaking = false; };
+            utter.onend = () => { this.isSpeaking = false; }; utter.onerror = () => { this.isSpeaking = false; };
             window.speechSynthesis.speak(utter);
         },
         copyToClipboard(text) { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text); } }
@@ -708,107 +682,116 @@ function translatorWidget() {
 function tripData() {
     const daysData = [
         {
-            shortTitle: 'D1 6/24', title: 'Day 1：抵達 · 海雲台放鬆日', subtitle: '輕鬆步行，感受釜山海岸風情',
+            shortTitle: 'D1 6/24', title: 'Day 1：抵達 · 海雲台烤肉與百萬夜景', subtitle: 'JX900 · 步行為主', passDay: '',
             events: [
-                { time: '14:00', type: 'flight', name: '🛬 抵達金海機場', desc: '搭乘預約好的包車大車直達 Shilla Stay 海雲台。', location: '김해국제공항 Gimhae Airport', detail: '🔹包車：KKday / Klook 預約「商務9人車」<br>🔹5人加5件大行李一車直達<br>🔹車程約 35–45 分鐘' },
-                { time: '15:00', type: 'hotel', name: '🏨 Check-in · 放行李', desc: 'Shilla Stay 海雲台，整個行程都住這，不換房！', location: '해운대 신라스테이', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } },
-                { time: '16:30', type: 'activity', name: '🌊 海雲台沙灘 + 冬柏島步道', desc: '飯店下樓就是沙灘，沿木棧道走向冬柏島，全平路，長輩走起來很舒服。', location: '해운대 해수욕장', tips: '全程步行無需叫車，建議穿拖鞋或涼鞋，天氣炎熱記得帶水！' },
-                { time: '18:00', type: 'activity', name: '🌅 The Bay 101 夜景', desc: '從冬柏島步道順著走即達，拍攝海雲台摩天大樓天際線最佳地點。', location: '더베이101 해운대', detail: '從冬柏島步道直走，不需叫車。適合拍照打卡，夜幕低垂後燈光最美。' },
-                { time: '19:00', type: 'food', name: '🍽️ 晚餐：海雲台傳統市場', desc: '在飯店周邊覓食，推薦韓式烤肉、海鮮鍋或傳統市場小吃。', location: '해운대시장', restaurants: [
-                    { name: '해운대시장 海雲台市場', dish: '傳統小吃、海鮮', price: '5,000–15,000', queue: '直接入場' },
-                    { name: '유지네집 韓式烤肉', dish: '豬五花烤肉', price: '15,000–20,000', queue: '稍候即入' }
-                ]}
+                { time: '11:00', type: 'flight', name: '🛬 抵達金海機場', desc: 'JX900 落地，通關＋提行李約 45–60 分鐘。', location: '김해국제공항 Gimhae Airport', detail: '🔹包車：KKday / Klook 商務9人車<br>🔹5人加5件大行李一車直達<br>🔹通關＋提行李預抓 45–60 分鐘' },
+                { time: '12:00', type: 'transport', name: '🚗 包車前往 Shilla Stay 海雲台', desc: '搭乘預約包車直達飯店。', detail: '🔹車程約 35–45 分鐘<br>🔹預計 13:00 前抵達飯店' },
+                { time: '13:00', type: 'hotel', name: '🏨 飯店寄放行李', desc: 'Check-in 通常 15:00，先寄放行李輕裝出發。', location: '신라스테이 해운대', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } },
+                { time: '13:15', type: 'food', name: '🍽️ 午餐：海雲台周邊', desc: '推薦豬肉湯飯或海鮮料理，快速填飽肚子。', location: '해운대', restaurants: [
+                    { name: '해운대 돼지국밥', dish: '豬肉湯飯', price: '9,000–12,000', queue: '即入' },
+                    { name: '해운대 해물탕', dish: '海鮮鍋', price: '15,000–25,000', queue: '即入' }
+                ]},
+                { time: '15:00', type: 'hotel', name: '🏨 飯店 Check-in', desc: '正式進房，稍作休息。' },
+                { time: '15:30', type: 'activity', name: '🌊 海雲台沙灘 + 冬柏島步道', desc: '飯店下樓即達，沿木棧道散步，全平路，長輩友善。', location: '해운대 동백섬', tips: '全程步行無需叫車，6月天氣炎熱記得帶水、防曬。' },
+                { time: '18:00', type: 'food', name: '🍖 晚餐：Ribs of Legend 海雲台', desc: '★已預約 18:00！準時抵達享用招牌排骨大餐。', location: 'Ribs of Legend Haeundae', isConfirmed: true, taxi: { krName: 'Ribs of Legend 해운대', address: '부산 해운대구 (預約時確認店址)' }, tips: '已預約 18:00，建議 17:45 前抵達。若從 The Bay 反過來安排亦可，依現場狀況彈性調整。' },
+                { time: '20:00', type: 'activity', name: '🌅 The Bay 101 夜景', desc: '吃飽後散步過去，欣賞天黑後最經典的摩天大樓水中倒影。', location: '더베이101 해운대', detail: '🔹晚餐後步行前往<br>🔹天黑後燈光倒影最美，拍照打卡熱點' }
             ]
         },
         {
-            shortTitle: 'D2 6/25', title: 'Day 2：海景火車 + 斜坡滑車', subtitle: '動線：尾浦 → 青沙浦 → 松亭（一路向東）', passDay: 'PASS 13:30 啟用',
+            shortTitle: 'D2 6/25', title: 'Day 2：海景列車 + 滑車 + 膠囊 + 水療', subtitle: '動線：尾浦→松亭→青沙浦→尾浦（膠囊）→Spa Land', passDay: 'PASS 09:30 啟用',
             events: [
-                { time: '09:30', type: 'transport', name: '🚕 出發前往尾浦站', desc: '車程約 5–10 分鐘。抵達後先持 Pass 到櫃檯換出 13:30 海岸列車車票！', isWarn: true, detail: '🔹搭計程車至尾浦站（미포）<br>🔹⚠ <b>抵達後立即換票</b>：持 VISIT BUSAN PASS 到尾浦站櫃檯，換出 13:30【青沙浦→松亭】的海岸列車實體票。熱門場次常賣完，務必一到就換！' },
-                { time: '10:00', type: 'train', name: '🚞 天空膠囊列車 尾浦→青沙浦', desc: '海景最美的方向，已預約！5人分成3人車+2人車。', isPass: false, tag: '需預約', detail: '🔹路線：尾浦站 → 青沙浦站<br>🔹此方向靠海座位最美<br>🔹5人預約：一台3人車 + 一台2人車<br>🔹官網：Blueline Park 提前2週預約<br>🔹費用：自費（非 Pass）', tips: '出發前2週上 Blueline Park 韓國官網預約，6/25 10:00~10:30 場次' },
-                { time: '10:40', type: 'activity', name: '🌊 青沙浦海女村 + 踏石觀景台', desc: '輕鬆散步，欣賞質樸海女文化與海岸景觀。', location: '청사포 해녀촌' },
-                { time: '12:00', type: 'food', name: '🍽️ 午餐：青沙浦海鮮', desc: '現撈海鮮，烤貝是這裡的招牌！', location: '청사포', restaurants: [
-                    { name: '청사포 조개구이 烤貝店', dish: '現烤各式貝類拼盤', price: '20,000–30,000', queue: '稍候即入' },
-                    { name: '청사포항 해물탕 海鮮湯', dish: '辣海鮮鍋', price: '15,000–25,000', queue: '即入' }
+                { time: '08:30', type: 'food', name: '☕ 飯店周邊早餐', desc: 'Isaac Toast 或咖啡外帶，建議邊走邊吃較從容。', detail: '🔹建議外帶邊走邊吃<br>🔹或提早至 08:15 出門購買，時間更充裕' },
+                { time: '09:10', type: 'transport', name: '🚶 步行前往尾浦站（Mipo）', desc: '從飯店步行約 10–15 分鐘。', location: 'Haeundae Blueline Park Mipo Station' },
+                { time: '09:30', type: 'train', name: '🚆 海岸列車 尾浦→松亭', desc: '★刷 VISIT BUSAN PASS 正式啟用 48H！', isPass: true, detail: '🔹路線：尾浦(미포) → 松亭(송정)<br>🔹★PASS 啟用點：48H 從此刻起算<br>🔹覆蓋至 DAY4 09:30' },
+                { time: '10:10', type: 'activity', name: '🛷 Skyline Luge 釜山斜坡滑車', desc: '纜車＋Luge 2–3 趟，約 2 小時。不玩的長輩可在景觀咖啡廳休息。', location: '스카이라인 루지 부산', isPass: true, taxi: { krName: '스카이라인 루지 부산', address: '부산 기장군 기장읍 기장해안로 205' }, tips: 'Luge 旺季排隊較長，若延遲可彈性壓縮後面松亭海邊時間，不影響 17:30 膠囊列車。' },
+                { time: '12:20', type: 'food', name: '🍽️ 午餐：松亭', desc: '推薦豬肉湯飯（最穩）或海鮮湯麵。', location: '송정', restaurants: [
+                    { name: '송정 돼지국밥', dish: '豬肉湯飯', price: '9,000–12,000', queue: '即入' },
+                    { name: '송정 해물칼국수', dish: '海鮮刀切麵', price: '10,000–15,000', queue: '即入' }
                 ]},
-                { time: '13:30', type: 'train', name: '🚆 海岸列車 青沙浦→松亭', isPass: true, desc: '正式刷 VISIT BUSAN PASS，啟用 48 小時計時！', detail: '🔹路線：청사포역 → 송정역<br>🔹⚠ 此車票為早上在尾浦站換出的實體票<br>🔹PASS 48H 從此刻起算，到明天 13:30 前有效' },
-                { time: '14:30', type: 'activity', name: '🛷 Skyline Luge 釜山斜坡滑車', isPass: true, desc: '從松亭站搭計程車5–10分鐘。不玩的長輩可在現場景觀咖啡廳休息。', location: '스카이라인 루지 부산', detail: '🔹從松亭站（송정역）搭計程車約 5–10 分鐘<br>🔹使用 VISIT BUSAN PASS 免費入場<br>🔹建議搭 2 趟：纜車上去 + 滑車下來', taxi: { krName: '스카이라인 루지 부산', address: '부산 기장군 기장읍 기장해안로 205' } },
-                { time: '17:00', type: 'transport', name: '🚕 搭車返回海雲台', desc: '今日行程結束，Kakao T 叫車返回飯店。', detail: '🔹用 Kakao T 叫 Venti（大車）接送5人<br>🔹車程約 30–40 分鐘' },
-                { time: '18:00', type: 'food', name: '🍽️ 晚餐：海雲台周邊', desc: '在飯店附近用餐，自由選擇。', restaurants: [
-                    { name: '해운대 갈매기 海鷗烤肉', dish: '豬五花、排骨烤肉', price: '15,000–25,000', queue: '建議稍早' },
-                    { name: '해운대 암소갈비집', dish: '牛排骨', price: '30,000–50,000', queue: '建議預約' }
-                ]},
-                { time: '19:30', type: 'activity', name: '🔱 晚間分流：泡湯 or 休息', desc: '自由選擇：去 Spa Land 泡湯，或直接回房充電。', isPass: true, detail: '🔹<b>泡湯組</b>：Kakao T 前往 Centum City（約10分鐘）→ Spa Land，使用 VISIT BUSAN PASS 免費入場。<b>請事先確認 PASS 當天最晚入場時間（通常22:00前）</b><br>🔹<b>回房組</b>：散步回 Shilla Stay，提早休息，明天行程豐富！', taxi: { krName: '스파랜드 센텀시티', address: '부산 해운대구 센텀남대로 59 신세계백화점 센텀시티' } }
+                { time: '13:20', type: 'activity', name: '🌊 松亭海邊放空散步', desc: '充電休息，完全不趕，讓長輩好好歇腳。', location: '송정해수욕장' },
+                { time: '14:20', type: 'train', name: '🚆 海岸列車 松亭→青沙浦', desc: '繼續搭海岸列車前往青沙浦。', isPass: true, detail: '🔹路線：松亭(송정) → 青沙浦(청사포)<br>🔹PASS 涵蓋' },
+                { time: '15:00', type: 'activity', name: '🌉 青沙浦散步', desc: '踏石觀景台、紅色燈塔、海岸步道。', location: '청사포 다릿돌 전망대' },
+                { time: '16:30', type: 'food', name: '☕ 青沙浦咖啡廳休息', desc: '等待膠囊列車時段，順便補充能量、看海。', location: '청사포 카페' },
+                { time: '17:30', type: 'train', name: '📸 天空膠囊列車 青沙浦→尾浦', desc: '★已訂票確認！19회차 17:30–18:00 入場，3人車＋2人車，享受夕陽海景。', location: '스카이캡슐 청사포', isConfirmed: true, detail: '🔹路線：青沙浦(청사포) → 尾浦(미포)<br>🔹Booking No. RS26008559298<br>🔹17:30–18:00 入場，2張票（3人車＋2人車）<br>🔹自費（非 PASS 項目）<br>🔹6月底日落約 19:30，此時段光線優美' },
+                { time: '18:10', type: 'food', name: '🍽️ 晚餐：海雲台', desc: '推薦傳聞中的元祖河豚湯，或選上菜快的店，目標 19:00 前結束。', location: '해운대', restaurants: [
+                    { name: '원조 복국 元祖河豚湯', dish: '河豚湯 복국', price: '12,000–20,000', queue: '即入' },
+                    { name: '해운대 돼지국밥', dish: '豬肉湯飯（最快）', price: '9,000–12,000', queue: '即入' }
+                ], tips: '目標 19:00 前結束晚餐，才能從容前往 Spa Land。' },
+                { time: '19:10', type: 'transport', name: '🚕 兩台計程車前往 Centum City', desc: '搭兩台計程車前往新世界 Centum City。', detail: '🔹海雲台 → Centum City 車程約 10 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '신세계 센텀시티 스파랜드', address: '부산 해운대구 센텀남대로 35' } },
+                { time: '19:30', type: 'activity', name: '♨️ Spa Land 汗蒸幕', desc: '使用 PASS 免費入場，可體驗至 22:00 關門，約 2.5 小時完整放鬆。', location: '스파랜드 센텀시티', isPass: true, detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹最晚入場 21:00（22:00 關門前1小時）<br>🔹19:30 入場可享完整體驗' },
+                { time: '22:00', type: 'transport', name: '🚕 搭計程車返回飯店', desc: '結束充實的一天！', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' }
             ]
         },
         {
-            shortTitle: 'D3 6/26', title: 'Day 3：百樓展望 + 南浦洞 + 煙火遊艇', subtitle: '動線：飯店→展望台→松島→南浦洞→廣安里（已調整時間）', passDay: 'PASS DAY 2',
+            shortTitle: 'D3 6/26', title: 'Day 3：百樓展望 + 松島 + 南浦洞', subtitle: '動線：飯店→松島→札嘎其→南浦洞→飯店', passDay: 'PASS DAY 2',
             events: [
-                { time: '09:00', type: 'food', name: '🥣 早餐：鮑魚粥', desc: '推薦飯店附近的濟州家或本粥，健康暖胃。', location: '죽집 해운대', restaurants: [
+                { time: '09:00', type: 'food', name: '🥣 早餐：鮑魚粥', desc: '推薦濟州家或本粥，健康暖胃。', location: '죽집 해운대', restaurants: [
                     { name: '제주家 濟州家', dish: '鮑魚粥 전복죽', price: '12,000–15,000', queue: '即入' },
                     { name: '본죽 本粥', dish: '多種韓式粥品', price: '8,000–14,000', queue: '即入' }
                 ]},
-                { time: '10:00', type: 'activity', name: '🏙️ BUSAN X the Sky 100 樓展望台', isPass: true, desc: '就在海雲台！超高速電梯直達100樓，透明玻璃步道俯瞰絕美海景，內有全球最高星巴克。', location: '엑스더스카이 해운대', detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹地點：엘시티 THE SHARP (LCT) 101F<br>🔹建議早上前往，人少視野清晰', taxi: { krName: '엑스더스카이', address: '부산 해운대구 달맞이길 30 엘시티 더샵 101층' } },
-                { time: '11:30', type: 'transport', name: '🚕 出發前往松島', isWarn: true, desc: '車程預抓 50–60 分鐘（週五上午可能塞車）。沿途行經兩大跨海大橋！', detail: '🔹⚠ <b>車程已調整</b>：原40分鐘改為預抓50–60分鐘緩衝<br>🔹兩大跨海大橋風景壯觀，長輩可車上補眠<br>🔹用 Kakao T 叫 Venti 大車' },
-                { time: '12:45', type: 'activity', name: '🚡 松島海上纜車', isPass: true, desc: 'Songdo Bay → Sky Park，水晶車廂，海景震撼！', location: '송도해상케이블카', taxi: { krName: '송도해상케이블카', address: '부산 서구 송도해변로 171' }, detail: '🔹使用 VISIT BUSAN PASS 免費搭乘<br>🔹水晶透明底板車廂，往返約 20 分鐘<br>🔹建議搭一趟去一趟回，體驗最完整' },
-                { time: '13:45', type: 'food', name: '🍽️ 午餐：松島周邊海鮮', desc: '就在纜車站附近用餐，新鮮海產。', location: '송도', restaurants: [
-                    { name: '송도 해물탕 海鮮鍋', dish: '辣海鮮鍋 해물탕', price: '15,000–25,000', queue: '即入' },
-                    { name: '송도 횟집 생선구이', dish: '烤魚定食', price: '12,000–18,000', queue: '即入' }
-                ]},
-                { time: '15:00', type: 'activity', name: '🛍️ 南浦洞市區 3 小時', desc: 'BIFF廣場、國際市場、富平罐頭市場，邊走邊吃小吃、採買海苔伴手禮。', location: '남포동', shopping: [
-                    { name: 'BIFF 廣場', items: '街頭小吃一條街，黑糖餅必吃' },
+                { time: '10:00', type: 'activity', name: '🏙️ BUSAN X the Sky 100樓展望台', desc: '就在海雲台，視長輩體力決定是否前往。', location: '엑스더스카이 해운대', isPass: true, tag: '視體力', detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹含全球最高星巴克<br>🔹體力允許就去，否則直接出發松島', taxi: { krName: '엑스더스카이', address: '부산 해운대구 달맞이길 30 엘시티' } },
+                { time: '10:30', type: 'transport', name: '🚕 搭計程車跨海前往松島', desc: '行經跨海大橋，沿途景色壯觀。', detail: '🔹車程約 40–50 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '11:30', type: 'activity', name: '🚡 松島海上纜車', desc: 'Songdo Bay → Sky Park，水晶車廂來回，海景震撼。', location: '송도해상케이블카', isPass: true, taxi: { krName: '송도해상케이블카', address: '부산 서구 송도해변로 171' }, detail: '🔹使用 VISIT BUSAN PASS 免費搭乘<br>🔹水晶透明車廂，建議來回各搭一趟' },
+                { time: '12:30', type: 'transport', name: '🚕 搭計程車前往札嘎其市場', desc: '從松島車程約 15 分鐘。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '13:00', type: 'food', name: '🦀 午餐：札嘎其市場海鮮大餐', desc: '一樓挑選帝王蟹、生章魚、貝類 → 二樓代客料理，靠窗海景座位。預抓 1.5–2 小時。', location: '자갈치시장', restaurants: [
+                    { name: '자갈치시장 札嘎其市場', dish: '帝王蟹、生章魚、綜合貝類', price: '30,000–50,000', queue: '一樓挑選二樓料理' }
+                ], tips: '一樓買海鮮、二樓代客料理，價格透明、店家多會簡單中文。每月第一、三個週二公休（6/26 週五營業）。' },
+                { time: '15:00', type: 'activity', name: '🛍️ 南浦洞市區悠閒逛街', desc: 'BIFF廣場、國際市場、富平罐頭市場，步行即達，無時間壓力。', location: '남포동', shopping: [
+                    { name: 'BIFF 廣場', items: '街頭小吃，黑糖餅必吃' },
                     { name: '국제시장 國際市場', items: '生活雜貨、紀念品、伴手禮' },
-                    { name: '부평깡통시장 富平罐頭市場', items: '傳統市場，夜市美食最熱鬧' }
-                ], tips: '南浦洞交通提醒：預計 17:30 出發前往廣安里，週五傍晚記得提早離開！' },
-                { time: '17:30', type: 'transport', name: '🚕 提早出發前往廣安里', isWarn: true, desc: '週五下班塞車，車程預抓 50–60 分鐘。遊艇 19:45，不能遲到！', detail: '🔹⚠ <b>已調整</b>：比原計畫提前30分鐘出發<br>🔹週五傍晚下班車潮，務必 17:30 前離開南浦洞<br>🔹Kakao T 叫 Venti 大車，預計 18:30 前抵達廣安里' },
-                { time: '18:30', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '悠閒用餐，欣賞廣安大橋夕陽，為遊艇做準備。', location: '광안리', restaurants: [
-                    { name: '광안리 바닷가 해산물', dish: '生魚片、海鮮料理', price: '20,000–35,000', queue: '建議稍早入座' },
-                    { name: '광안리 갈비 排骨', dish: '韓式牛排骨', price: '30,000–50,000', queue: '建議預約' }
+                    { name: '부평깡통시장 富平罐頭市場', items: '傳統市場美食' }
                 ]},
-                { time: '19:45', type: 'activity', name: '🎆 廣安里煙火遊艇', isPass: true, tag: '需預約', desc: '海上近距離觀賞廣安大橋夜景與週五限定微型煙火！', location: '광안리 유람선', detail: '🔹使用 VISIT BUSAN PASS 搭乘（需事先預約）<br>🔹買好 Pass 後，透過 Pass 官網以 LINE 或 Email 向商家預約 6/26（五）19:45 場次<br>🔹週五限定微型煙火，在海上欣賞廣安大橋夜景', tips: '遊艇為週五限定！出發前請再次確認是否仍有舉辦。入場請提早 15 分鐘抵達碼頭。' },
-                { time: '21:00', type: 'transport', name: '🚕 搭車回海雲台', desc: 'Kakao T 叫車返回 Shilla Stay 飯店，今日行程豐富，好好休息！' }
+                { time: '18:00', type: 'food', name: '🍽️ 晚餐：南浦洞在地料理', desc: '在地海鮮或韓定食，不需趕車，悠閒享用。', location: '남포동', restaurants: [
+                    { name: '남포동 해산물', dish: '生魚片、海鮮料理', price: '20,000–35,000', queue: '稍候即入' },
+                    { name: '남포동 한정식', dish: '韓定食套餐', price: '15,000–25,000', queue: '即入' }
+                ]},
+                { time: '20:00', type: 'transport', name: '🚕 搭計程車返回海雲台', desc: '車程約 35 分鐘，輕鬆結束今天。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' }
             ]
         },
         {
-            shortTitle: 'D4 6/27', title: 'Day 4：西面購物 + 廣安里夕陽', subtitle: '動線：飯店 → 西面商圈 → 廣安里 → 飯店',
+            shortTitle: 'D4 6/27', title: 'Day 4：西面購物 + 廣安里 + 煙火遊艇', subtitle: '動線：飯店→西面→廣安里→水營灣遊艇', passDay: '',
             events: [
-                { time: '09:30', type: 'food', name: '😴 悠閒早餐', desc: '長輩今天睡飽，不趕早，悠閒吃早餐再出發。' },
-                { time: '10:30', type: 'transport', name: '🚕 出發前往西面商圈', desc: '車程約 30 分鐘，Kakao T 叫車。', detail: '🔹Kakao T 叫 Venti 大車<br>🔹目的地：서면역 (Seomyeon Station)' },
-                { time: '11:00', type: 'activity', name: '🛍️ 西面商圈 + 地下街', desc: '早上人潮最少，專攻地下街（全平路有冷氣）！', location: '서면', shopping: [
-                    { name: '서면 지하상가 西面地下街', items: '全平路冷氣舒適，服飾、飾品、雜貨' },
-                    { name: 'Olive Young 올리브영', items: '韓國美妝保養，必掃 MEDIHEAL、COSRX' },
-                    { name: 'SPAO', items: '韓系平價服飾，版型好、CP值高' },
-                    { name: '롯데백화점 樂天百貨', items: '長輩累了可在一樓咖啡廳休息' }
-                ], tips: '早上11點人最少，下午後人潮增加。長輩逛累了，樂天百貨一樓有咖啡廳可休息等候。' },
-                { time: '13:30', type: 'food', name: '🍖 午餐：豬肉湯飯', desc: '釜山必吃代表美食！松亭3代豬肉湯飯是在地人的最愛。', location: '돼지국밥', restaurants: [
-                    { name: '송정3대국밥 松亭3代豬肉湯飯', dish: '돼지국밥 豬肉湯飯', price: '9,000–12,000', queue: '中午可能稍候' },
+                { time: '09:30', type: 'food', name: '☕ 悠閒早餐', desc: '長輩睡飽再出發，不趕早。' },
+                { time: '10:30', type: 'transport', name: '🚕 搭計程車前往西面商圈', desc: '車程約 30 分鐘。', detail: '🔹目的地：서면 (Seomyeon)<br>🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '11:00', type: 'activity', name: '🛍️ 西面商圈逛街', desc: '主攻全平路冷氣房的地下街、Olive Young。', location: '서면', shopping: [
+                    { name: '서면 지하상가 西面地下街', items: '全平路冷氣，服飾、飾品、雜貨' },
+                    { name: 'Olive Young 올리브영', items: 'MEDIHEAL、COSRX 美妝必掃' },
+                    { name: 'SPAO', items: '韓系平價服飾' },
+                    { name: '롯데백화점 樂天百貨', items: '長輩可在一樓咖啡廳休息' }
+                ]},
+                { time: '13:00', type: 'food', name: '🍖 午餐：松亭3代豬肉湯飯', desc: '釜山必吃代表美食。', location: '서면 돼지국밥', restaurants: [
+                    { name: '송정3대국밥 松亭3代豬肉湯飯', dish: '돼지국밥 豬肉湯飯', price: '9,000–12,000', queue: '中午稍候' },
                     { name: '신창돼지국밥', dish: '豬肉湯飯 + 小菜', price: '9,000–11,000', queue: '即入' }
                 ]},
-                { time: '14:30', type: 'activity', name: '☕ 西面特色咖啡廳', desc: '韓國咖啡廳文化超厲害！在西面找一間打卡咖啡廳休息，或繼續補買戰利品。', location: '서면 카페', tips: '西面有很多 IG 風格咖啡廳，可搜尋「서면 카페추천」找口碑店家。' },
-                { time: '16:00', type: 'transport', name: '🚕 出發前往廣安里', desc: '車程約 20 分鐘。', detail: '🔹Kakao T 叫 Venti 大車<br>🔹目的地：광안리해수욕장' },
-                { time: '16:30', type: 'activity', name: '🌊 廣安里海灘夕陽散步', desc: '避開正中午烈日，在沙灘邊漫步，找一間面海景觀咖啡廳看廣安大橋夕陽。', location: '광안리 해수욕장', tips: '6月釜山氣溫高，建議帶防曬、墨鏡。廣安里沙灘旁有很多咖啡廳，找面海的二樓座位最讚！' },
-                { time: '18:00', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '最後一個廣安里夜晚，好好享用海景晚餐！', location: '광안리', restaurants: [
-                    { name: '광안리 소갈비 牛排骨', dish: '韓式牛排骨 소갈비', price: '35,000–55,000', queue: '建議預約' },
-                    { name: '광안리 삼겹살 五花肉', dish: '烤豬五花 + 燒酒', price: '15,000–25,000', queue: '即入' }
+                { time: '14:00', type: 'food', name: '☕ 西面咖啡廳休息', desc: '繼續採買，或坐下來歇腳。', location: '서면 카페' },
+                { time: '15:30', type: 'transport', name: '🚕 搭計程車前往廣安里', desc: '車程約 20 分鐘。', detail: '🔹目的地：광안리해수욕장<br>🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '16:00', type: 'activity', name: '🌊 廣安里海灘夕陽散步', desc: '找間海景咖啡廳悠閒看廣安大橋，6月底日落約 19:30。', location: '광안리 해수욕장', tips: '6月氣溫高，帶防曬、墨鏡。沙灘旁咖啡廳找面海二樓座位最佳。' },
+                { time: '18:30', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '充裕用餐，21:30 遊艇前有足夠時間。', location: '광안리', restaurants: [
+                    { name: '광안리 소갈비 牛排骨', dish: '韓式牛排骨', price: '35,000–55,000', queue: '建議預約' },
+                    { name: '광안리 삼겹살', dish: '烤豬五花', price: '15,000–25,000', queue: '即入' }
                 ]},
-                { time: '20:00', type: 'transport', name: '🌙 返回海雲台', desc: '散步或叫車返回 Shilla Stay，享受最後一晚的海風。' }
+                { time: '20:40', type: 'transport', name: '🚕 計程車前往水營灣遊艇競技場', desc: '從廣安里過去車程約 10–15 分鐘。', detail: '🔹目的地：수영만요트경기장 (水營灣遊艇競技場)<br>🔹注意：上船點在此，非廣安里海灘正面<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '수영만요트경기장', address: '부산 해운대구 우동 1393' } },
+                { time: '21:00', type: 'activity', name: '🚶 抵達碼頭等候報到', desc: '提早抵達辦理報到手續。', location: '수영만요트경기장' },
+                { time: '21:30', type: 'activity', name: '🎆 廣安里煙火遊艇', desc: '★已預約確認（Klook 自購）！海上近距離觀賞廣安大橋夜景與煙火。', location: '광안리 유람선', isConfirmed: true, detail: '🔹Klook 購票，非 PASS 項目<br>🔹從水營灣遊艇競技場出發<br>🔹海上觀賞廣安大橋夜景與煙火，約 60 分鐘' },
+                { time: '22:45', type: 'transport', name: '🚕 搭計程車返回海雲台', desc: '車程約 20 分鐘，結束釜山最精彩的夜晚。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' }
             ]
         },
         {
-            shortTitle: 'D5 6/28', title: 'Day 5：最後採買 + 回程', subtitle: '慢活早晨，從容回台',
+            shortTitle: 'D5 6/28', title: 'Day 5：最後採買 + 輕鬆回程', subtitle: '慢活早晨，從容回台 · JX903', passDay: '',
             events: [
-                { time: '09:30', type: 'food', name: '🌅 慢活早餐', desc: '最後一天，悠閒享用早餐。' },
-                { time: '10:30', type: 'activity', name: '🛍️ 海雲台主街最後採買', isWarn: true, desc: '先購物再 Check-out！Olive Young、大創補貨，買完直接回飯店塞行李箱。', location: '해운대 올리브영', shopping: [
-                    { name: 'Olive Young 올리브영 海雲台店', items: 'MEDIHEAL 面膜、COSRX 痘痘貼、氣墊粉底' },
-                    { name: 'Daiso 다이소 大創', items: '韓國限定款、收納小物、泡麵' },
-                    { name: '해운대시장 伴手禮', items: '海苔禮盒、韓國零食、調味料' }
-                ], tips: '⚠ 已調整：先購物10:30，再回飯店 Check-out 12:00，避免同一時間衝突。買完立刻回飯店塞行李，完全不需手提著走。' },
-                { time: '12:00', type: 'hotel', name: '🏨 辦理 Check-out · 行李寄放', desc: '退房，行李寄放飯店櫃檯，等待包車來接。', detail: '🔹Check-out 時間：12:00<br>🔹行李寄放在 Shilla Stay 大廳，出發時再取' },
-                { time: '12:30', type: 'food', name: '🍽️ 午餐：最後一餐', desc: '海雲台特色料理，為釜山之旅畫下完美句點。', location: '해운대', restaurants: [
-                    { name: '동태찌개 大鱈魚湯', dish: '動太찌개 辣鱈魚湯', price: '10,000–15,000', queue: '即入' },
-                    { name: '교촌치킨 橋村炸雞', dish: '韓式炸雞 + 啤酒', price: '18,000–25,000', queue: '即入' }
+                { time: '09:30', type: 'food', name: '☕ 慢活早餐', desc: '最後一天，悠閒享用早餐。' },
+                { time: '10:30', type: 'activity', name: '🛍️ 海雲台主街最後採買', desc: 'Olive Young、大創補貨，買完回飯店直接塞進行李箱。', location: '해운대 올리브영', shopping: [
+                    { name: 'Olive Young 海雲台店', items: 'MEDIHEAL 面膜、COSRX、氣墊粉底' },
+                    { name: 'Daiso 다이소 大創', items: '韓國限定款、收納小物' },
+                    { name: '해운대시장 伴手禮', items: '海苔禮盒、韓國零食' }
                 ]},
-                { time: '15:00', type: 'transport', name: '🧳 取行李 → 包車前往金海機場', desc: '搭乘預約好的包車大車直達金海機場，完美避開傍晚通勤車潮！', detail: '🔹包車：KKday / Klook 預約「商務9人車」<br>🔹車程約 35–45 分鐘<br>🔹出發前再次確認機票、護照', isWarn: false },
-                { time: '18:55', type: 'flight', name: '✈️ 搭機回台北', desc: '結束美好的釜山五日遊，帶著滿滿的回憶和戰利品回家！', location: '김해국제공항 Gimhae Airport', tips: '建議提前 2.5–3 小時抵達機場辦理報到。金海機場免稅店可補購最後伴手禮。' }
+                { time: '12:00', type: 'hotel', name: '🏨 辦理 Check-out + 寄放行李', desc: '退房，行李寄放飯店櫃檯。' },
+                { time: '12:30', type: 'food', name: '🍽️ 午餐：海雲台', desc: '推薦瓦屋大鱈魚湯或韓式炸雞，為旅程畫下句點。', location: '해운대', restaurants: [
+                    { name: '동태찌개 大鱈魚湯', dish: '辣鱈魚湯', price: '10,000–15,000', queue: '即入' },
+                    { name: '교촌치킨 橋村炸雞', dish: '韓式炸雞', price: '18,000–25,000', queue: '即入' }
+                ]},
+                { time: '15:00', type: 'transport', name: '🧳 取行李 → 包車前往金海機場', desc: '搭乘預約包車直達金海機場，避開傍晚通勤車潮。', detail: '🔹包車：KKday / Klook 商務9人車<br>🔹車程約 35–45 分鐘<br>🔹出發前再次確認機票、護照' },
+                { time: '18:55', type: 'flight', name: '✈️ 搭機回台北（JX903）', desc: '結束美好的釜山五日遊，帶著滿滿回憶和戰利品回家！', location: '김해국제공항 Gimhae Airport', tips: '建議提前 2.5–3 小時抵達機場辦理報到。金海機場免稅店可補購最後伴手禮。' }
             ]
         }
     ];
@@ -817,56 +800,54 @@ function tripData() {
         ticketsWallet: {
             '🎫 VISIT BUSAN PASS 48H': '（KKday/Klook 電子票代號）',
             '🏨 Shilla Stay 海雲台': '（訂位代號待填）• 4晚 6/24–6/28',
-            '🚞 天空膠囊列車': '（Blueline Park 預約編號）6/25 10:00',
-            '🚤 廣安里遊艇': '（以 LINE/Email 預約 6/26 19:45）',
+            '🚞 天空膠囊列車': 'RS26008559298 • 6/25 17:30',
+            '🎆 廣安里煙火遊艇': '（Klook 購票代號）6/27 21:30',
+            '🍖 Ribs of Legend': '（預約代號）6/24 18:00',
             '🚗 機場包車去程': '（KKday/Klook 預約代號）',
             '🚗 機場包車回程': '（KKday/Klook 預約代號）'
         },
         tickets: [
             { name: '機場接送包車（去回）', desc: 'KKday / Klook 商務9人車，5人+5行李', link: 'https://www.kkday.com/zh-tw/product/12013' },
             { name: 'VISIT BUSAN PASS 48H', desc: 'KKday / Klook 購買電子票', link: 'https://www.kkday.com/zh-tw/product/7598' },
-            { name: '天空膠囊列車預約', desc: 'Blueline Park 官網，6/25 10:00–10:30 尾浦→青沙浦', link: 'https://www.bluelinepark.com/' },
-            { name: 'Skyline Luge 釜山', desc: '使用 VISIT BUSAN PASS 免費入場', link: 'https://www.skylineluge.com/kr/busan/' },
-            { name: 'Spa Land 確認入場時間', desc: '確認 PASS 當天最晚入場時間', link: 'https://www.spaland.co.kr/' },
-            { name: '廣安里煙火遊艇預約', desc: '購買 Pass 後以 LINE/Email 預約 6/26 19:45', link: 'https://www.visitbusan.net/tw/index.do' }
+            { name: '天空膠囊列車', desc: '★已訂 RS26008559298 · 6/25 17:30 青沙浦→尾浦', link: 'https://www.bluelinepark.com/' },
+            { name: '廣安里煙火遊艇', desc: '★已於 Klook 購票 · 6/27 21:30 水營灣出發', link: 'https://www.klook.com/zh-TW/' },
+            { name: 'Ribs of Legend 海雲台', desc: '★已預約 6/24 18:00 晚餐', link: 'https://map.naver.com/' },
+            { name: 'Spa Land 確認入場時間', desc: '最晚入場 21:00（22:00 關門前1小時）', link: 'https://www.spaland.co.kr/' }
         ],
         luggage: {
             '證件': [
                 { name: '護照（效期6個月以上）', checked: false },
-                { name: '機票 QR Code（截圖備用）', checked: false },
+                { name: '機票 QR Code（JX900/JX903 截圖）', checked: false },
                 { name: '台幣換韓幣 / 信用卡', checked: false },
                 { name: 'T-money 交通卡（或現場購買）', checked: false }
             ],
             '電子': [
                 { name: '網卡 / eSIM（韓國用）', checked: false },
                 { name: '行動電源', checked: false },
-                { name: '充電組（韓國 220V / A型）', checked: false },
+                { name: '充電組（韓國 220V / C型）', checked: false },
                 { name: 'Kakao T 叫車 APP 下載', checked: false }
             ],
             '生活': [
                 { name: '衣物（5天）', checked: false },
                 { name: '防曬乳（海邊必備）', checked: false },
-                { name: '泳裝（海雲台沙灘）', checked: false },
+                { name: '泳裝 / 替換衣物（Spa Land）', checked: false },
                 { name: '牙刷 / 常備藥', checked: false },
                 { name: '摺疊雨傘（6月梅雨季）', checked: false }
             ]
         },
         shopping: {
             '韓國美妝': [
-                { name: 'MEDIHEAL 面膜禮盒', desc: 'Olive Young 必買，親友最愛', checked: false },
-                { name: 'COSRX 痘痘貼', desc: '超好用，台灣貴很多', checked: false },
-                { name: '韓國氣墊粉底', desc: 'Laneige / IOPE / 蘭芝', checked: false },
-                { name: '韓國防曬乳', desc: '質地輕薄好推，CP值高', checked: false }
+                { name: 'MEDIHEAL 面膜禮盒', desc: 'Olive Young 必買', checked: false },
+                { name: 'COSRX 痘痘貼', desc: '台灣貴很多', checked: false },
+                { name: '韓國氣墊粉底', desc: 'Laneige / IOPE', checked: false }
             ],
             '食品伴手禮': [
-                { name: '海苔禮盒 김조림', desc: '釜山最有名的伴手禮', checked: false },
-                { name: '韓國零食禮盒', desc: '蜂蜜奶油薯片、海苔片', checked: false },
-                { name: '大醬醬料組', desc: '正宗韓式豆瓣醬', checked: false },
-                { name: '泡麵（限定款）', checked: false, desc: '大創或超市購買' }
+                { name: '海苔禮盒', desc: '釜山名產', checked: false },
+                { name: '韓國零食禮盒', desc: '蜂蜜奶油薯片', checked: false },
+                { name: '泡麵（限定款）', desc: '大創或超市', checked: false }
             ],
             '其他': [
-                { name: 'Daiso 韓國限定款', desc: '台灣找不到的款式', checked: false },
-                { name: '韓服體驗服飾配件', desc: '甘川洞或景福宮周邊', checked: false }
+                { name: 'Daiso 韓國限定款', desc: '台灣找不到', checked: false }
             ]
         }
     };
@@ -874,9 +855,9 @@ function tripData() {
     let initialData = defaultPrepData;
     let initialMoney = [];
     try {
-        const s = localStorage.getItem('busan_2026_v1');
+        const s = localStorage.getItem('busan_2026_v2');
         if(s && s !== 'undefined') initialData = JSON.parse(s);
-        const m = localStorage.getItem('busan_2026_money_v1');
+        const m = localStorage.getItem('busan_2026_money_v2');
         if(m && m !== 'undefined') initialMoney = JSON.parse(m);
     } catch(e) { console.error('Data error', e); }
 
@@ -892,14 +873,14 @@ function tripData() {
         prepData: initialData, moneyList: initialMoney, days: daysData,
         weatherData: { busan: { temp: '--', icon: 'ph-sun', desc: '載入中' } },
         toastText: '', showToast: false, toastLeaving: false,
-        modalOpen: false, showAddModal: false, showMoneyModal: false, showTaxiModal: false,
+        modalOpen: false, showAddModal: false, showMoneyModal: false, showTaxiModal: false, showTaxiReceiptModal: false,
         currentPhrase: { kr:'', cn:'', romaji:'', cat:'' }, currentTaxi: { krName:'', address:'' },
         newItem: { cat: '韓國美妝', name: '', desc: '' },
         newMoney: { title:'', amount:'', cat:'food' },
         showEditMoneyModal: false, editMoney: { title:'', amount:'', cat:'food', idx:-1 },
         showWeatherDetail: false, phraseTab: 'food',
         simulatedTime: null, activeEventId: null,
-        statusMsg: 'v1 • 2026 韓國釜山 • Made with ❤️',
+        statusMsg: 'v2 • 2026 韓國釜山 • Made with ❤️',
 
         phrases: {
             food: [
@@ -917,12 +898,20 @@ function tripData() {
                 { kr: '영수증 주세요', cn: '請給我收據', romaji: 'Yeongsujeung juseyo' },
                 { kr: '봉투 주세요', cn: '請給我袋子', romaji: 'Bongtu juseyo' }
             ],
+            taxi: [
+                { kr: '영수증 주세요', cn: '請給我收據', romaji: 'Yeongsujeung juseyo' },
+                { kr: '미터기로 가주세요', cn: '請按跳表計費', romaji: 'Miteogiro gajuseyo' },
+                { kr: '최단 거리로 가주세요', cn: '請走最短路線', romaji: 'Choedan georiro gajuseyo' },
+                { kr: '여기까지 가주세요', cn: '請載我到這裡', romaji: 'Yeogikkaji gajuseyo' },
+                { kr: '얼마예요?', cn: '車資多少錢？', romaji: 'Eolmayeyo?' },
+                { kr: '카드로 결제해요', cn: '我要刷卡付款', romaji: 'Kadeuro gyeoljehaeyo' }
+            ],
             help: [
                 { kr: '역이 어디예요?', cn: '車站在哪裡？', romaji: 'Yeogyui eodieyeyo?' },
-                { kr: '사진 찍어 주세요', cn: '幫我拍照', romaji: 'Sajin jjigo juseyo' },
+                { kr: '사진 찍어 주세요', cn: '幫我拍照', romaji: 'Sajin jjigeo juseyo' },
                 { kr: '도와주세요', cn: '請幫幫我', romaji: 'Dowajuseyo' },
                 { kr: '화장실이 어디예요?', cn: '廁所在哪？', romaji: 'Hwajangsil eodieyeyo?' },
-                { kr: '병원에 가고 싶어요', cn: '我想去醫院', romaji: 'Byeongwon gago sipeoyo' }
+                { kr: '병원에 가고 싶어요', cn: '我想去醫院', romaji: 'Byeongwone gago sipeoyo' }
             ]
         },
 
@@ -960,7 +949,7 @@ function tripData() {
         },
 
         speak(text, lang='ko-KR') {
-            if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 0.9; window.speechSynthesis.speak(u); } else { alert('你的瀏覽器不支援發音'); }
+            if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 0.85; window.speechSynthesis.speak(u); } else { alert('你的瀏覽器不支援發音'); }
         },
 
         openChat() { this.showChatModal = true; this.$nextTick(() => this.scrollToBottom()); },
@@ -1072,7 +1061,7 @@ function tripData() {
         slideTo(i) { this.swiperInstance?.slideTo(i); },
         updateSwiperHeight() { setTimeout(()=>{ this.swiperInstance?.updateAutoHeight(300); this.swiperInstance?.update(); },100); },
         toggleCheck(item) { item.checked = !item.checked; this.saveChecks(); },
-        saveChecks() { try { localStorage.setItem('busan_2026_v1', JSON.stringify(this.prepData)); } catch(e) {} },
+        saveChecks() { try { localStorage.setItem('busan_2026_v2', JSON.stringify(this.prepData)); } catch(e) {} },
 
         addMoney() {
             if (!this.newMoney.title.trim()) { this.toast('請輸入項目名稱'); return; }
@@ -1089,7 +1078,7 @@ function tripData() {
         confirmDeleteMoney() { this.moneyList.splice(this.editMoney.idx,1); this.saveMoney(); this.showEditMoneyModal=false; this.toast('已刪除'); },
         deleteMoney(idx) { this.moneyList.splice(idx,1); this.saveMoney(); },
         resetMoney() { if(confirm('清空所有消費紀錄？')){ this.moneyList=[]; this.saveMoney(); } },
-        saveMoney() { try { localStorage.setItem('busan_2026_money_v1', JSON.stringify(this.moneyList)); this.$nextTick(()=>this.updateSwiperHeight()); } catch(e){} },
+        saveMoney() { try { localStorage.setItem('busan_2026_money_v2', JSON.stringify(this.moneyList)); this.$nextTick(()=>this.updateSwiperHeight()); } catch(e){} },
 
         getCatTotal(cat) { return this.moneyList.filter(i=>i.cat===cat).reduce((s,i)=>s+Number(i.amount),0); },
         getCatLabel(cat) { return {food:'飲食',shop:'購物',traffic:'交通',other:'其他'}[cat]||cat; },
@@ -1114,7 +1103,8 @@ function tripData() {
         addItem() { if(!this.newItem.name.trim())return; this.prepData.shopping[this.newItem.cat].push({name:this.newItem.name,desc:this.newItem.desc||'',checked:false}); this.saveChecks(); this.showAddModal=false; this.toast('已新增'); },
         deleteItem(cat,idx) { if(confirm('刪除此項目？')){ this.prepData.shopping[cat].splice(idx,1); this.saveChecks(); } },
         openTaxi(event) { if(event.taxi){ this.currentTaxi=event.taxi; this.showTaxiModal=true; } },
-        openPhrase(p,catName) { const catMap={food:'餐廳',shop:'購物',help:'緊急'}; this.currentPhrase={...p,cat:catMap[catName]}; this.modalOpen=true; },
+        openTaxiReceipt() { this.showTaxiReceiptModal = true; },
+        openPhrase(p,catName) { const catMap={food:'餐廳',shop:'購物',taxi:'計程車',help:'緊急'}; this.currentPhrase={...p,cat:catMap[catName]}; this.modalOpen=true; },
 
         startClock() { this.checkActiveEvent(); setInterval(()=>this.checkActiveEvent(),60000); },
         getNow() { return this.simulatedTime || new Date(); },
@@ -1149,7 +1139,7 @@ function tripData() {
 
         getIconColor(t) { const c={transport:'bg-blue-500',food:'bg-orange-400',activity:'bg-slate-700',hotel:'bg-indigo-500',flight:'bg-sky-500',train:'bg-teal-500'}; return c[t]||'bg-slate-400'; },
         getIconClass(t) { const i={transport:'ph-bold ph-taxi',food:'ph-bold ph-bowl-food',activity:'ph-bold ph-camera',hotel:'ph-bold ph-bed',flight:'ph-bold ph-airplane-tilt',train:'ph-bold ph-train'}; return i[t]||'ph-circle'; },
-        getTagColor(t) { if(t==='需預約')return'bg-red-100 text-red-600'; if(t==='必吃')return'bg-orange-100 text-orange-600'; return'bg-blue-100 text-blue-600'; }
+        getTagColor(t) { if(t==='需預約')return'bg-red-100 text-red-600'; if(t==='必吃')return'bg-orange-100 text-orange-600'; if(t==='視體力')return'bg-purple-100 text-purple-600'; return'bg-blue-100 text-blue-600'; }
     };
 }
 </script>
