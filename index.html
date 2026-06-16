@@ -57,12 +57,36 @@
         .pass-badge { background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
         .warn-badge { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
         .confirm-badge { background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
+        .ontime-badge { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 9999px; display: inline-block; }
+        .next-event-bar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 4000; width: calc(100% - 32px); max-width: 420px; }
+        @keyframes slide-up { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        .next-event-enter { animation: slide-up 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards; }
     </style>
 </head>
 <body class="text-slate-700" x-data="tripData()" x-init="initApp()">
 
     <div x-show="showToast" x-cloak :class="toastLeaving ? 'toast-leave' : 'toast-enter'" class="fixed right-4 z-[9999] bg-black/75 text-white px-4 py-2.5 rounded-full text-xs font-bold backdrop-blur-md flex items-center gap-2" style="top: calc(env(safe-area-inset-top) + 20px);">
         <i class="ph-bold ph-check-circle text-green-400"></i><span x-text="toastText"></span>
+    </div>
+
+    <!-- 下一個行程浮動提示 -->
+    <div x-show="nextEvent && showNextBar" x-cloak class="next-event-bar next-event-enter" style="bottom: calc(env(safe-area-inset-bottom) + 90px);">
+        <div @click="goToNextEvent()" class="bg-slate-800/95 backdrop-blur-md text-white rounded-2xl shadow-2xl px-4 py-3 flex items-center gap-3 cursor-pointer active:scale-95 transition-transform border border-white/10">
+            <div class="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
+                <i class="ph-fill ph-arrow-right text-lg"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wide flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-blue-400 rounded-full live-dot inline-block"></span>
+                    接下來 · <span x-text="nextEvent ? nextEvent.time : ''"></span>
+                </div>
+                <div class="text-sm font-bold truncate" x-text="nextEvent ? nextEvent.name : ''"></div>
+                <div x-show="nextEvent && nextEvent.transportHint" class="text-[10px] text-blue-300 truncate" x-text="nextEvent ? nextEvent.transportHint : ''"></div>
+            </div>
+            <button @click.stop="showNextBar = false" class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform">
+                <i class="ph-bold ph-x text-xs text-slate-300"></i>
+            </button>
+        </div>
     </div>
 
     <button @click="openChat()" class="fixed bottom-6 right-6 z-[5000] w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full shadow-xl flex items-center justify-center text-white active:scale-90 transition-transform border-4 border-white/20">
@@ -182,7 +206,7 @@
     <header class="glass-nav">
         <div class="px-4">
             <div class="flex justify-between items-center mb-4">
-                <div>
+                <div @click="enableSimulateMode()">
                     <h1 class="text-xl font-bold text-slate-800">2026 韓國釜山 🇰🇷</h1>
                     <p class="text-[10px] text-slate-400 font-bold uppercase">JUN 24 - 28 • 5 DAYS • 5 PAX</p>
                 </div>
@@ -243,9 +267,14 @@
                             <div class="border-b border-gray-100 last:border-0">
                                 <div class="bg-gray-50 px-4 py-2 text-[10px] font-bold text-slate-400 uppercase" x-text="category"></div>
                                 <template x-for="item in items">
-                                    <div @click="toggleCheck(item)" class="flex items-center gap-3 px-4 py-3 active:bg-gray-50 cursor-pointer">
+                                    <div @click="toggleCheck(item)" class="flex items-center gap-3 px-4 py-3 active:bg-gray-50 cursor-pointer" :class="{'bg-sky-50': item.name.includes('雨傘') && tripHasRain}">
                                         <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center check-circle flex-shrink-0" :class="item.checked?'checked-bg border-transparent':'border-gray-300'"><i x-show="item.checked" class="ph-bold ph-check text-white text-sm"></i></div>
-                                        <span class="text-sm font-medium text-slate-700" :class="{'line-through opacity-40':item.checked}" x-text="item.name"></span>
+                                        <div class="flex-1">
+                                            <span class="text-sm font-medium text-slate-700" :class="{'line-through opacity-40':item.checked}" x-text="item.name"></span>
+                                            <template x-if="item.name.includes('雨傘') && tripHasRain">
+                                                <div class="text-[10px] text-sky-600 font-bold mt-0.5 flex items-center gap-1"><i class="ph-fill ph-umbrella"></i> 本次行程預報有雨，務必攜帶！</div>
+                                            </template>
+                                        </div>
                                     </div>
                                 </template>
                             </div>
@@ -278,6 +307,59 @@
 
                 <!-- Slide 1: 資訊 -->
                 <div class="swiper-slide px-4 pb-6">
+
+                    <!-- 今日要用的票券 -->
+                    <div x-show="todayTickets.length > 0" class="ios-card p-4 mb-6 border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white"><i class="ph-fill ph-push-pin"></i></div>
+                            <div><h3 class="font-bold text-slate-800">今日要用的票券</h3><p class="text-[10px] text-slate-400" x-text="todayLabel"></p></div>
+                        </div>
+                        <div class="space-y-2">
+                            <template x-for="(t, idx) in todayTickets" :key="idx">
+                                <div class="bg-white rounded-xl p-3 border border-blue-100 flex justify-between items-center">
+                                    <div class="flex-1 min-w-0 mr-2">
+                                        <div class="text-xs font-bold text-slate-700 truncate" x-text="t.key"></div>
+                                        <div class="text-base font-mono font-bold text-blue-600 truncate" x-text="t.val"></div>
+                                    </div>
+                                    <button @click="copyToClipboard(t.val)" class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"><i class="ph-bold ph-copy text-blue-600"></i></button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- 匯率換算機 -->
+                    <div class="ios-card p-4 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600"><i class="ph-fill ph-calculator"></i></div>
+                                <h3 class="font-bold text-slate-800">匯率換算機</h3>
+                            </div>
+                            <div class="flex items-center gap-1 text-[10px] text-slate-400">
+                                <span>1₩=</span>
+                                <input type="number" x-model.number="fxRate" @change="saveFxRate()" step="0.001" class="w-14 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-mono font-bold text-slate-700 outline-none focus:border-green-400 text-right">
+                                <span>NT$</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="bg-slate-50 rounded-xl p-3 flex items-center gap-2">
+                                <span class="text-lg font-bold text-slate-400 w-8">₩</span>
+                                <input type="number" inputmode="numeric" x-model.number="fxKrw" @input="fxFrom='krw'" placeholder="韓幣金額" class="flex-1 bg-transparent text-xl font-mono font-bold text-slate-800 outline-none min-w-0">
+                                <span class="text-[10px] text-slate-400 flex-shrink-0">韓幣 KRW</span>
+                            </div>
+                            <div class="flex justify-center"><i class="ph-bold ph-arrows-down-up text-slate-300"></i></div>
+                            <div class="bg-green-50 rounded-xl p-3 flex items-center gap-2 border border-green-100">
+                                <span class="text-lg font-bold text-green-500 w-8">NT$</span>
+                                <input type="number" inputmode="numeric" x-model.number="fxNtd" @input="fxFrom='ntd'" placeholder="台幣金額" class="flex-1 bg-transparent text-xl font-mono font-bold text-slate-800 outline-none min-w-0">
+                                <span class="text-[10px] text-slate-400 flex-shrink-0">台幣 TWD</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 mt-3">
+                            <template x-for="amt in [10000, 30000, 50000, 100000]">
+                                <button @click="fxKrw = amt; fxFrom='krw'" class="bg-slate-100 text-slate-600 text-[11px] font-bold py-2 rounded-lg active:scale-95 transition-transform" x-text="'₩'+(amt/10000)+'萬'"></button>
+                            </template>
+                        </div>
+                    </div>
+
                     <div class="ios-card p-4 mb-6 bg-slate-800 text-white">
                         <div class="flex items-center gap-2 mb-4"><i class="ph-fill ph-ticket text-yellow-400 text-xl"></i><h3 class="font-bold">票券收納夾</h3></div>
                         <div class="space-y-3">
@@ -434,6 +516,61 @@
                                 <div x-show="day.passDay" class="bg-green-50 px-3 py-1 rounded-full text-xs font-bold text-green-700 flex items-center gap-1"><i class="ph-fill ph-ticket text-green-500"></i><span x-text="day.passDay"></span></div>
                             </div>
                         </div>
+
+                        <!-- 當日天氣帶 -->
+                        <template x-if="getDayForecast(index)">
+                            <div class="ios-card p-4 mb-4" :class="getPopBg(getDayForecast(index).pop)">
+                                <div class="flex items-center gap-3">
+                                    <i :class="getDayForecast(index).icon + ' text-3xl text-sky-500 flex-shrink-0'"></i>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-lg font-black text-slate-800"><span x-text="getDayForecast(index).tmax"></span>°</span>
+                                            <span class="text-sm text-slate-400">/ <span x-text="getDayForecast(index).tmin"></span>°</span>
+                                            <span class="text-sm text-slate-500" x-text="getDayForecast(index).desc"></span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 mt-1 text-xs font-bold" :class="getPopColor(getDayForecast(index).pop)">
+                                            <i class="ph-fill ph-drop"></i>
+                                            <span>降雨機率 <span x-text="getDayForecast(index).pop !== null ? getDayForecast(index).pop + '%' : '—'"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-bold bg-white/60 rounded-xl px-3 py-2 mt-3">
+                                    <i class="ph-fill ph-t-shirt text-sm text-slate-400"></i>
+                                    <span x-text="getDayForecast(index).outfit"></span>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- 預報未開放提示 -->
+                        <template x-if="!forecastReady && !getDayForecast(index)">
+                            <div class="ios-card p-3 mb-4 bg-slate-50 border border-slate-100 flex items-center gap-2">
+                                <i class="ph-bold ph-cloud-fog text-slate-400 text-lg"></i>
+                                <span class="text-xs text-slate-400" x-text="forecastMsg"></span>
+                            </div>
+                        </template>
+
+                        <!-- 雨備建議（降雨機率 > 50%）-->
+                        <template x-if="getDayForecast(index) && getDayForecast(index).rainy && rainBackup[index]">
+                            <div class="ios-card overflow-hidden mb-4 border border-sky-200">
+                                <div class="bg-sky-500 text-white px-4 py-2.5 flex items-center gap-2">
+                                    <i class="ph-fill ph-umbrella text-lg"></i>
+                                    <span class="font-bold text-sm">☔ 雨備建議</span>
+                                    <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full ml-auto">當日降雨機率高</span>
+                                </div>
+                                <div class="p-3 space-y-2">
+                                    <template x-for="(bk, bkIdx) in rainBackup[index]" :key="bkIdx">
+                                        <div class="bg-sky-50 rounded-xl p-3 flex justify-between items-center">
+                                            <div class="flex-1 min-w-0 mr-2">
+                                                <div class="text-sm font-bold text-slate-700" x-text="bk.name"></div>
+                                                <div class="text-[11px] text-slate-500 mt-0.5" x-text="bk.note"></div>
+                                            </div>
+                                            <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(bk.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-sky-500 flex-shrink-0 active:scale-90 transition-transform"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
                         <div class="relative pl-4">
                             <div class="timeline-line"></div>
                             <div class="space-y-6">
@@ -450,6 +587,7 @@
                                                         <template x-if="isCurrentEvent(index,event)"><span class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">進行中 NOW</span></template>
                                                         <template x-if="event.isPass"><span class="pass-badge">PASS</span></template>
                                                         <template x-if="event.isConfirmed"><span class="confirm-badge">✓ 已預約</span></template>
+                                                        <template x-if="event.mustOnTime"><span class="ontime-badge">⏰ 準時</span></template>
                                                         <template x-if="event.isWarn"><span class="warn-badge">⚠ 注意</span></template>
                                                     </div>
                                                     <template x-if="event.tag"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" :class="getTagColor(event.tag)" x-text="event.tag"></span></template>
@@ -465,6 +603,12 @@
                                             </div>
                                             <div class="bg-slate-50 border-t border-slate-100 text-sm expand-content" :class="{'expanded':expanded}">
                                                 <div class="p-4 space-y-4">
+                                                    <template x-if="event.mustOnTime">
+                                                        <div class="bg-red-50 p-3 rounded-xl border border-red-200 text-red-800 text-xs leading-relaxed flex gap-2">
+                                                            <i class="ph-fill ph-alarm text-lg flex-shrink-0 text-red-500"></i>
+                                                            <div><span class="font-bold">不可遲到！</span>建議提前 <b x-text="event.leadTime || 15"></b> 分鐘出發（最晚 <span class="font-bold" x-text="getLeadDepartTime(event)"></span> 前出發），預留交通與排隊緩衝。</div>
+                                                        </div>
+                                                    </template>
                                                     <template x-if="event.detail">
                                                         <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-slate-600">
                                                             <div class="text-xs font-bold text-blue-500 mb-2 uppercase flex items-center gap-1"><i class="ph-bold ph-info"></i> 詳細說明</div>
@@ -693,7 +837,7 @@ function tripData() {
                 ]},
                 { time: '15:00', type: 'hotel', name: '🏨 飯店 Check-in', desc: '正式進房，稍作休息。' },
                 { time: '15:30', type: 'activity', name: '🌊 海雲台沙灘 + 冬柏島步道', desc: '飯店下樓即達，沿木棧道散步，全平路，長輩友善。', location: '해운대 동백섬', tips: '全程步行無需叫車，6月天氣炎熱記得帶水、防曬。' },
-                { time: '18:00', type: 'food', name: '🍖 晚餐：Ribs of Legend 海雲台', desc: '★已預約 18:00！準時抵達享用招牌排骨大餐。', location: 'Ribs of Legend Haeundae', isConfirmed: true, taxi: { krName: 'Ribs of Legend 해운대', address: '부산 해운대구 (預約時確認店址)' }, tips: '已預約 18:00，建議 17:45 前抵達。若從 The Bay 反過來安排亦可，依現場狀況彈性調整。' },
+                { time: '18:00', type: 'food', name: '🍖 晚餐：Ribs of Legend 海雲台', desc: '★已預約 18:00！準時抵達享用招牌排骨大餐。', location: 'Ribs of Legend Haeundae', isConfirmed: true, mustOnTime: true, leadTime: 15, taxi: { krName: 'Ribs of Legend 해운대', address: '부산 해운대구 (預約時確認店址)' }, tips: '已預約 18:00，建議 17:45 前抵達。若從 The Bay 反過來安排亦可，依現場狀況彈性調整。' },
                 { time: '20:00', type: 'activity', name: '🌅 The Bay 101 夜景', desc: '吃飽後散步過去，欣賞天黑後最經典的摩天大樓水中倒影。', location: '더베이101 해운대', detail: '🔹晚餐後步行前往<br>🔹天黑後燈光倒影最美，拍照打卡熱點' }
             ]
         },
@@ -712,7 +856,7 @@ function tripData() {
                 { time: '14:20', type: 'train', name: '🚆 海岸列車 松亭→青沙浦', desc: '繼續搭海岸列車前往青沙浦。', isPass: true, detail: '🔹路線：松亭(송정) → 青沙浦(청사포)<br>🔹PASS 涵蓋' },
                 { time: '15:00', type: 'activity', name: '🌉 青沙浦散步', desc: '踏石觀景台、紅色燈塔、海岸步道。', location: '청사포 다릿돌 전망대' },
                 { time: '16:30', type: 'food', name: '☕ 青沙浦咖啡廳休息', desc: '等待膠囊列車時段，順便補充能量、看海。', location: '청사포 카페' },
-                { time: '17:30', type: 'train', name: '📸 天空膠囊列車 青沙浦→尾浦', desc: '★已訂票確認！19회차 17:30–18:00 入場，3人車＋2人車，享受夕陽海景。', location: '스카이캡슐 청사포', isConfirmed: true, detail: '🔹路線：青沙浦(청사포) → 尾浦(미포)<br>🔹Booking No. RS26008559298<br>🔹17:30–18:00 入場，2張票（3人車＋2人車）<br>🔹自費（非 PASS 項目）<br>🔹6月底日落約 19:30，此時段光線優美' },
+                { time: '17:30', type: 'train', name: '📸 天空膠囊列車 青沙浦→尾浦', desc: '★已訂票確認！19회차 17:30–18:00 入場，3人車＋2人車，享受夕陽海景。', location: '스카이캡슐 청사포', isConfirmed: true, mustOnTime: true, leadTime: 20, detail: '🔹路線：青沙浦(청사포) → 尾浦(미포)<br>🔹Booking No. RS26008559298<br>🔹17:30–18:00 入場，2張票（3人車＋2人車）<br>🔹自費（非 PASS 項目）<br>🔹6月底日落約 19:30，此時段光線優美' },
                 { time: '18:10', type: 'food', name: '🍽️ 晚餐：海雲台', desc: '推薦傳聞中的元祖河豚湯，或選上菜快的店，目標 19:00 前結束。', location: '해운대', restaurants: [
                     { name: '원조 복국 元祖河豚湯', dish: '河豚湯 복국', price: '12,000–20,000', queue: '即入' },
                     { name: '해운대 돼지국밥', dish: '豬肉湯飯（最快）', price: '9,000–12,000', queue: '即入' }
@@ -772,7 +916,7 @@ function tripData() {
                 ]},
                 { time: '20:40', type: 'transport', name: '🚕 計程車前往水營灣遊艇競技場', desc: '從廣安里過去車程約 10–15 分鐘。', detail: '🔹目的地：수영만요트경기장 (水營灣遊艇競技場)<br>🔹注意：上船點在此，非廣安里海灘正面<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '수영만요트경기장', address: '부산 해운대구 우동 1393' } },
                 { time: '21:00', type: 'activity', name: '🚶 抵達碼頭等候報到', desc: '提早抵達辦理報到手續。', location: '수영만요트경기장' },
-                { time: '21:30', type: 'activity', name: '🎆 廣安里煙火遊艇', desc: '★已預約確認（Klook 自購）！海上近距離觀賞廣安大橋夜景與煙火。', location: '광안리 유람선', isConfirmed: true, detail: '🔹Klook 購票，非 PASS 項目<br>🔹從水營灣遊艇競技場出發<br>🔹海上觀賞廣安大橋夜景與煙火，約 60 分鐘' },
+                { time: '21:30', type: 'activity', name: '🎆 廣安里煙火遊艇', desc: '★已預約確認（Klook 自購）！海上近距離觀賞廣安大橋夜景與煙火。', location: '광안리 유람선', isConfirmed: true, mustOnTime: true, leadTime: 30, detail: '🔹Klook 購票，非 PASS 項目<br>🔹從水營灣遊艇競技場出發<br>🔹海上觀賞廣安大橋夜景與煙火，約 60 分鐘' },
                 { time: '22:45', type: 'transport', name: '🚕 搭計程車返回海雲台', desc: '車程約 20 分鐘，結束釜山最精彩的夜晚。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' }
             ]
         },
@@ -872,6 +1016,9 @@ function tripData() {
         chatHistory: JSON.parse(localStorage.getItem('busan_chat_history') || '[]'),
         prepData: initialData, moneyList: initialMoney, days: daysData,
         weatherData: { busan: { temp: '--', icon: 'ph-sun', desc: '載入中' } },
+        dailyForecast: {},
+        forecastReady: false,
+        forecastMsg: '天氣預報載入中...',
         toastText: '', showToast: false, toastLeaving: false,
         modalOpen: false, showAddModal: false, showMoneyModal: false, showTaxiModal: false, showTaxiReceiptModal: false,
         currentPhrase: { kr:'', cn:'', romaji:'', cat:'' }, currentTaxi: { krName:'', address:'' },
@@ -880,7 +1027,10 @@ function tripData() {
         showEditMoneyModal: false, editMoney: { title:'', amount:'', cat:'food', idx:-1 },
         showWeatherDetail: false, phraseTab: 'food',
         simulatedTime: null, activeEventId: null,
-        statusMsg: 'v2 • 2026 韓國釜山 • Made with ❤️',
+        nextEvent: null, showNextBar: true,
+        fxRate: parseFloat(localStorage.getItem('busan_fx_rate')) || 0.023,
+        fxKrw: null, fxNtd: null, fxFrom: 'krw',
+        statusMsg: 'v4 • 2026 韓國釜山 • Made with ❤️',
 
         phrases: {
             food: [
@@ -915,6 +1065,33 @@ function tripData() {
             ]
         },
 
+        // 各日室內雨備方案（dayIndex → 備案陣列）
+        rainBackup: {
+            0: [ // DAY1 海雲台
+                { name: '新世界 Centum City', note: '全球最大百貨，逛街吃飯一整天不無聊' },
+                { name: 'BUSAN X the Sky', note: '室內展望台，雨天看雲海別有風情' }
+            ],
+            1: [ // DAY2 海雲台/青沙浦東部
+                { name: 'Spa Land 汗蒸幕', note: '本來就在行程內，雨天更適合久待放鬆' },
+                { name: '電影殿堂 영화의전당', note: 'Centum City 旁，建築本身就是看點' },
+                { name: '新世界 Centum City', note: '室內百貨，避雨兼採買' }
+            ],
+            2: [ // DAY3 松島/南浦洞
+                { name: '樂天百貨 光復店', note: '南浦洞地標，頂樓空中花園、水舞秀' },
+                { name: '南浦洞地下街', note: '全程室內，服飾雜貨好逛' },
+                { name: '札嘎其市場（室內樓層）', note: '本來就在行程內，室內海鮮樓層不怕雨' }
+            ],
+            3: [ // DAY4 西面
+                { name: '西面地下街', note: '本來就是室內主場，雨天零影響' },
+                { name: '樂天百貨 釜山本店', note: '西面站直結，避雨採買一次搞定' },
+                { name: 'NC百貨 / 咖啡廳', note: '西面咖啡廳林立，躲雨歇腳剛好' }
+            ],
+            4: [ // DAY5 海雲台
+                { name: '海雲台周邊賣場', note: 'Olive Young、大創室內採買最後衝刺' },
+                { name: '飯店大廳休息', note: '雨大就在飯店悠閒等包車' }
+            ]
+        },
+
         get luggageProgress() {
             let total = 0, checked = 0;
             for (const items of Object.values(this.prepData.luggage || {})) { total += items.length; checked += items.filter(i => i.checked).length; }
@@ -922,9 +1099,41 @@ function tripData() {
         },
         get totalSpent() { return this.moneyList.reduce((acc, item) => acc + Number(item.amount), 0); },
 
+        // 今日票券：依目前日期對應 ticketsWallet 中相關項目
+        get todayLabel() {
+            const now = this.getNow();
+            const m = now.getMonth() + 1, d = now.getDate();
+            return `${m}月${d}日`;
+        },
+        get todayTickets() {
+            const now = this.getNow();
+            if (now.getMonth() + 1 !== 6) return [];
+            const d = now.getDate();
+            // 各日期對應會用到的票券關鍵字
+            const dayKeywords = {
+                24: ['包車', 'Shilla', 'Ribs'],
+                25: ['PASS', '膠囊'],
+                26: ['PASS'],
+                27: ['遊艇'],
+                28: ['包車', 'Shilla']
+            };
+            const keywords = dayKeywords[d];
+            if (!keywords) return [];
+            const result = [];
+            for (const [key, val] of Object.entries(this.prepData.ticketsWallet || {})) {
+                if (keywords.some(kw => key.includes(kw))) {
+                    result.push({ key, val });
+                }
+            }
+            return result;
+        },
+
         initApp() {
             this.initWeather();
             this.startClock();
+            this.computeNextEvent();
+            this.$watch('fxKrw', (v) => { if (this.fxFrom === 'krw' && v != null && v !== '') this.fxNtd = Math.round(v * this.fxRate); else if (v === '' || v == null) { if (this.fxFrom === 'krw') this.fxNtd = null; } });
+            this.$watch('fxNtd', (v) => { if (this.fxFrom === 'ntd' && v != null && v !== '') this.fxKrw = Math.round(v / this.fxRate); else if (v === '' || v == null) { if (this.fxFrom === 'ntd') this.fxKrw = null; } });
             setTimeout(() => {
                 this.swiperInstance = new Swiper('.mySwiper', {
                     autoHeight: true, spaceBetween: 20, observer: true, observeParents: true, speed: 400,
@@ -933,6 +1142,52 @@ function tripData() {
                 setTimeout(() => this.autoNavigate(), 800);
             }, 500);
             if (!this.prepData || !this.prepData.luggage) { this.resetData(); }
+        },
+
+        saveFxRate() { try { localStorage.setItem('busan_fx_rate', this.fxRate); } catch(e) {} if (this.fxKrw != null) this.fxNtd = Math.round(this.fxKrw * this.fxRate); },
+
+        // 最晚出發時間 = 行程時間 - leadTime 分鐘
+        getLeadDepartTime(event) {
+            if (!event || !event.time) return '';
+            const [h, m] = event.time.split(':').map(Number);
+            const lead = event.leadTime || 15;
+            let total = h * 60 + m - lead;
+            if (total < 0) total += 1440;
+            const hh = Math.floor(total / 60), mm = total % 60;
+            return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+        },
+
+        // 計算「下一個行程」
+        computeNextEvent() {
+            const now = this.getNow();
+            if (now.getMonth() + 1 !== 6) { this.nextEvent = null; return; }
+            const dateMap = { 24:0, 25:1, 26:2, 27:3, 28:4 };
+            const dayIndex = dateMap[now.getDate()];
+            if (dayIndex === undefined) { this.nextEvent = null; return; }
+            const events = this.days[dayIndex].events;
+            const nowMins = now.getHours() * 60 + now.getMinutes();
+            // 找出第一個時間 > 現在的行程
+            for (let i = 0; i < events.length; i++) {
+                const [h, m] = events[i].time.split(':').map(Number);
+                if (h * 60 + m > nowMins) {
+                    const ev = events[i];
+                    let transportHint = '';
+                    if (ev.type === 'transport' || ev.type === 'train') {
+                        transportHint = ev.desc ? ev.desc.replace(/[。！]/g, '').slice(0, 24) : '';
+                    }
+                    this.nextEvent = { time: ev.time, name: ev.name, transportHint, dayIndex, eventIdx: i };
+                    return;
+                }
+            }
+            this.nextEvent = null;
+        },
+
+        goToNextEvent() {
+            if (!this.nextEvent) return;
+            const target = this.nextEvent.dayIndex + 3;
+            this.activeIndex = target;
+            this.swiperInstance?.slideTo(target);
+            this.centerTab(target);
         },
 
         centerTab(index) {
@@ -1027,7 +1282,68 @@ function tripData() {
 
         toast(t) { this.toastText=t; this.toastLeaving=false; this.showToast=true; setTimeout(()=>{ this.toastLeaving=true; setTimeout(()=>{ this.showToast=false; this.toastLeaving=false; },200); },1800); },
 
-        async initWeather() { await this.fetchW(35.1595, 129.0596, 'busan'); },
+        async initWeather() { await this.fetchW(35.1595, 129.0596, 'busan'); await this.fetchDailyForecast(35.1595, 129.0596); },
+
+        // 抓取每日預報（6/24–6/28）
+        async fetchDailyForecast(lat, lon) {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=Asia%2FSeoul&start_date=2026-06-24&end_date=2026-06-28`;
+                const r = await fetch(url);
+                const d = await r.json();
+                if (!d.daily || !d.daily.time || d.daily.time.length === 0) {
+                    this.forecastReady = false;
+                    this.forecastMsg = '預報尚未開放，出發前 1–2 週再查看';
+                    return;
+                }
+                const map = {};
+                d.daily.time.forEach((dateStr, i) => {
+                    // dateStr 格式 2026-06-24 → 對應 dayIndex
+                    const day = parseInt(dateStr.split('-')[2]);
+                    const dayIndex = { 24:0, 25:1, 26:2, 27:3, 28:4 }[day];
+                    if (dayIndex === undefined) return;
+                    const code = d.daily.weather_code?.[i] ?? 0;
+                    const tmax = Math.round(d.daily.temperature_2m_max?.[i] ?? 0);
+                    const tmin = Math.round(d.daily.temperature_2m_min?.[i] ?? 0);
+                    const pop = d.daily.precipitation_probability_max?.[i] ?? null;
+                    const psum = d.daily.precipitation_sum?.[i] ?? 0;
+                    map[dayIndex] = {
+                        icon: this.getWeatherIcon(code), desc: this.getWeatherDesc(code),
+                        tmax, tmin, pop, psum,
+                        outfit: this.getOutfitTip(tmax, code, 0),
+                        rainy: pop !== null && pop > 50
+                    };
+                });
+                this.dailyForecast = map;
+                this.forecastReady = Object.keys(map).length > 0;
+                if (!this.forecastReady) this.forecastMsg = '預報尚未開放，出發前 1–2 週再查看';
+            } catch(e) {
+                this.forecastReady = false;
+                this.forecastMsg = '天氣預報暫時無法載入，請檢查網路';
+            }
+        },
+
+        // 取得某日預報
+        getDayForecast(dayIndex) { return this.dailyForecast[dayIndex] || null; },
+
+        // 降雨機率顏色分級
+        getPopColor(pop) {
+            if (pop === null || pop === undefined) return 'text-slate-400';
+            if (pop < 30) return 'text-green-600';
+            if (pop <= 60) return 'text-amber-500';
+            return 'text-red-500';
+        },
+        getPopBg(pop) {
+            if (pop === null || pop === undefined) return 'bg-slate-50 border-slate-100';
+            if (pop < 30) return 'bg-green-50 border-green-100';
+            if (pop <= 60) return 'bg-amber-50 border-amber-100';
+            return 'bg-red-50 border-red-100';
+        },
+
+        // 整趟是否有任一天會下雨（給打包清單用）
+        get tripHasRain() {
+            return Object.values(this.dailyForecast).some(f => f && f.pop !== null && f.pop > 50);
+        },
+
         getWeatherIcon(code) {
             if (code===0) return 'ph-sun'; if (code<=2) return 'ph-cloud-sun'; if (code<=3) return 'ph-cloud';
             if (code<=48) return 'ph-cloud-fog'; if (code<=67) return 'ph-cloud-rain'; if (code<=77) return 'ph-snowflake';
@@ -1106,8 +1422,22 @@ function tripData() {
         openTaxiReceipt() { this.showTaxiReceiptModal = true; },
         openPhrase(p,catName) { const catMap={food:'餐廳',shop:'購物',taxi:'計程車',help:'緊急'}; this.currentPhrase={...p,cat:catMap[catName]}; this.modalOpen=true; },
 
-        startClock() { this.checkActiveEvent(); setInterval(()=>this.checkActiveEvent(),60000); },
+        startClock() { this.checkActiveEvent(); this.computeNextEvent(); setInterval(()=>{ this.checkActiveEvent(); this.computeNextEvent(); },60000); },
         getNow() { return this.simulatedTime || new Date(); },
+
+        enableSimulateMode() {
+            const choice = prompt('🕐 時光機測試\n輸入要模擬的日期時間，格式：MMDD-HHMM\n例如 0625-1700 代表 6/25 17:00\n（清空並確定可關閉模擬）', '0625-1700');
+            if (choice === null) return;
+            if (choice.trim() === '') { this.simulatedTime = null; this.toast('已關閉時光機'); this.checkActiveEvent(); this.computeNextEvent(); this.$nextTick(()=>{ this.autoNavigate(); this.updateSwiperHeight(); }); return; }
+            const match = choice.trim().match(/^(\d{2})(\d{2})-(\d{2})(\d{2})$/);
+            if (!match) { this.toast('格式錯誤'); return; }
+            const [, mm, dd, hh, min] = match;
+            this.simulatedTime = new Date(2026, parseInt(mm)-1, parseInt(dd), parseInt(hh), parseInt(min));
+            this.showNextBar = true;
+            this.checkActiveEvent(); this.computeNextEvent();
+            this.$nextTick(()=>{ this.autoNavigate(); setTimeout(()=>this.updateSwiperHeight(),100); });
+            this.toast(`已切換至 ${mm}/${dd} ${hh}:${min}`);
+        },
 
         checkActiveEvent() {
             const now = this.getNow();
