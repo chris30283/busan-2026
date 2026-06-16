@@ -1030,7 +1030,7 @@ function tripData() {
         nextEvent: null, showNextBar: true,
         fxRate: parseFloat(localStorage.getItem('busan_fx_rate')) || 0.023,
         fxKrw: null, fxNtd: null, fxFrom: 'krw',
-        statusMsg: 'v4 • 2026 韓國釜山 • Made with ❤️',
+        statusMsg: 'v6 • 2026 韓國釜山 • Made with ❤️',
 
         phrases: {
             food: [
@@ -1259,8 +1259,69 @@ function tripData() {
             if (!this.apiKey) { alert('請先設定 API Key'); this.showKeySettings = true; return; }
             this.isAiThinking = true;
             const cleanModelId = this.modelId.replace('models/','');
-            const simpleContext = this.days.map(d => `${d.shortTitle}: ` + d.events.map(e=>`${e.time} ${e.name}`).join(', ')).join('\n');
-            const systemInstruction = `你是「Busan Bot」，親切的釜山旅遊助理。行程：\n${simpleContext}\n\n用繁體中文回答，簡潔實用。`;
+
+            // 建立完整行程脈絡：包含已預約、PASS、注意、交通、餐廳等所有欄位
+            const richContext = this.days.map(d => {
+                let lines = [`【${d.shortTitle}】${d.title}`];
+                if (d.subtitle) lines.push(`  動線：${d.subtitle}`);
+                if (d.passDay) lines.push(`  PASS：${d.passDay}`);
+                d.events.forEach(e => {
+                    let tags = [];
+                    if (e.isConfirmed) tags.push('✅已預約');
+                    if (e.isPass) tags.push('🎫使用PASS');
+                    if (e.mustOnTime) tags.push(`⏰不可遲到(提前${e.leadTime||15}分)`);
+                    if (e.isWarn) tags.push('⚠️注意');
+                    if (e.tag) tags.push(e.tag);
+                    let line = `  ${e.time} ${e.name}`;
+                    if (tags.length) line += ` [${tags.join(' ')}]`;
+                    if (e.desc) line += `｜${e.desc}`;
+                    if (e.restaurants && e.restaurants.length) line += `｜餐廳：${e.restaurants.map(r=>r.name).join('、')}`;
+                    if (e.shopping && e.shopping.length) line += `｜逛街：${e.shopping.map(s=>s.name).join('、')}`;
+                    lines.push(line);
+                });
+                return lines.join('\n');
+            }).join('\n\n');
+
+            // 票券/預約代號資訊
+            const ticketInfo = Object.entries(this.prepData.ticketsWallet || {})
+                .map(([k,v]) => `  ${k}: ${v}`).join('\n');
+
+            // 已預約行程摘要（讓 AI 能直接回答「哪些已預約」）
+            const confirmedList = [];
+            this.days.forEach(d => d.events.forEach(e => {
+                if (e.isConfirmed) confirmedList.push(`${d.shortTitle} ${e.time} ${e.name}`);
+            }));
+            const confirmedSummary = confirmedList.length
+                ? `\n\n【已預約/已訂票的行程】\n${confirmedList.map(c=>'  ✅ '+c).join('\n')}`
+                : '';
+
+            // 各日雨備方案（讓 AI 與畫面顯示一致）
+            const dayNames = ['DAY1 6/24 海雲台','DAY2 6/25 海雲台/青沙浦','DAY3 6/26 松島/南浦洞','DAY4 6/27 西面/廣安里','DAY5 6/28 海雲台'];
+            const rainInfo = Object.entries(this.rainBackup || {})
+                .map(([idx, list]) => `  ${dayNames[idx]||('DAY'+(parseInt(idx)+1))}：${list.map(b=>b.name+'（'+b.note+'）').join('、')}`)
+                .join('\n');
+            const rainSummary = rainInfo ? `\n\n【各日下雨室內備案】（與 app 行程頁的雨備卡一致，下雨時請優先推薦這些）\n${rainInfo}` : '';
+
+            const systemInstruction = `你是「Busan Bot」，一位親切又精準的釜山家族旅遊助理（使用者為5人家族團含長輩，2026/6/24-28，住海雲台 Shilla Stay）。
+
+以下是完整行程資訊，請務必根據這些資料準確回答，不要憑空猜測：
+
+${richContext}
+${confirmedSummary}
+${rainSummary}
+
+【票券與預約代號】
+${ticketInfo}
+
+【回答原則】
+- 用繁體中文，簡潔實用。
+- 標記說明：「✅已預約」=已經訂好的（如 Ribs of Legend、天空膠囊列車、廣安里遊艇）；「🎫使用PASS」=用 VISIT BUSAN PASS 免費入場；「⏰不可遲到」=有預約時段需準時。
+- 注意區分「已預約(✅)」和「需要預約(tag為需預約)」是不同的事，回答時不要混淆。
+- 若使用者問哪些行程已預約，請列出標記「✅已預約」的項目。
+- 若使用者問下雨備案，請優先推薦上方「各日下雨室內備案」清單中對應當天的方案，保持與 app 畫面一致。
+- 美食推薦時，可先介紹當天行程已安排的餐廳，若使用者想要更多選擇，再用你的知識補充其他釜山在地美食。
+- 不確定的事就說不確定，不要編造。`;
+
             const history = this.chatHistory.slice(0, -1).map(m => ({ role: m.role==='ai'?'model':'user', parts:[{text:m.content}] }));
             history.push({ role:'user', parts:[{text:userMsg}] });
             const payload = { system_instruction:{parts:[{text:systemInstruction}]}, contents: history };
