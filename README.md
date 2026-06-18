@@ -13,7 +13,7 @@
 | **行前** | 必備預約清單、打包進度條、戰利品購物清單（可新增/刪除/分享）|
 | **資訊** | 今日票券聚合、匯率換算機、VISIT BUSAN PASS 說明、計程車防坑提醒、手指韓文、即時語音翻譯 |
 | **記帳** | 韓幣消費紀錄、分類統計長條圖、台幣換算、匯出分享 |
-| **每日行程（D1–D5）** | 時間軸行程卡、每日天氣帶、下雨室內備案、Google Maps 導航、計程車字卡 |
+| **每日行程（D1–D5）** | 時間軸行程卡、每日天氣帶、下雨室內備案、Google + Naver 雙地圖導航、計程車字卡 |
 
 ### 重點特色
 
@@ -22,8 +22,9 @@
 - 💱 **匯率換算機**：韓幣 ⇄ 台幣雙向即時換算，匯率可自訂。
 - ⏰ **不可遲到提醒**：為有預約時段的行程（Ribs of Legend、天空膠囊列車、廣安里遊艇）標記準時徽章與建議出發時間。
 - 📍 **下一個行程浮動提示**：依當下時間自動顯示接下來的行程與交通。
+- 🗺️ **Google + Naver 雙地圖導航**：每個景點、餐廳、購物點都提供 Google Maps 與 Naver Map 兩顆導航按鈕。Naver Map 在韓國當地資訊更完整（Google 在韓國常搜不到），兩者互補不留死角。Naver 採用 `https://map.naver.com/p/search/` 網頁連結，未裝 App 可開網頁、已裝會自動詢問跳轉 App。
 - 🗣️ **手指韓文 + 即時語音翻譯**：常用韓語字卡（含計程車防坑用語），中韓雙向語音翻譯朗讀。
-- 🧾 **計程車防坑功能**：一鍵顯示「請給我收據」等韓語字卡與語音，避免亂收費。
+- 🧾 **計程車防坑功能 + Taxi Card**：一鍵顯示「請給我收據」等韓語字卡與語音；主要搭車目的地（含每天回飯店的回程）都備有 Taxi Card，顯示韓文店名與地址給司機看，可朗讀、可直接 Naver 導航。
 - 💾 **本地儲存**：打包清單、記帳、設定皆存於瀏覽器 localStorage，關掉再開資料還在。
 - 🕐 **時光機測試模式**：點標題可模擬任意日期時間，預覽「進行中」「下一個行程」等動態效果。
 
@@ -47,6 +48,7 @@
 | AI 助理 | Google Gemini API | ✅ 需自備 API Key（使用者於 App 內設定）|
 | 天氣預報 | [Open-Meteo](https://open-meteo.com/) | ❌ 免費、免金鑰 |
 | 即時翻譯 | [MyMemory](https://mymemory.translated.net/) | ❌ 免費、免金鑰 |
+| 地圖導航 | Google Maps / [Naver Map](https://map.naver.com/) 網頁連結 | ❌ 免金鑰（純連結跳轉）|
 | 語音辨識/朗讀 | 瀏覽器 Web Speech API | ❌ 瀏覽器內建 |
 
 > ⚠️ **天氣預報限制**：Open-Meteo 免費版僅能預報未來約 16 天。出發前太早開啟會顯示「預報尚未開放」，屬正常現象，接近出發日（約行前 1–2 週）資料才會出現。
@@ -117,7 +119,7 @@ AI 功能需要 Google Gemini API Key（免費額度足夠個人使用）：
   type: 'train',                    // 類型：flight/transport/train/food/activity/hotel
   name: '📸 天空膠囊列車 青沙浦→尾浦', // 名稱
   desc: '...',                      // 簡述
-  location: '스카이캡슐 청사포',      // 地點（Google Maps 導航用）
+  location: '스카이캡슐 청사포',      // 地點（Google Maps & Naver Map 導航用）
   isConfirmed: true,                // 標記為「已預約」
   isPass: true,                     // 標記為「使用 VISIT BUSAN PASS」
   mustOnTime: true,                 // 標記為「不可遲到」
