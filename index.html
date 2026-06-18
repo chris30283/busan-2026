@@ -564,7 +564,10 @@
                                                 <div class="text-sm font-bold text-slate-700" x-text="bk.name"></div>
                                                 <div class="text-[11px] text-slate-500 mt-0.5" x-text="bk.note"></div>
                                             </div>
-                                            <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(bk.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-sky-500 flex-shrink-0 active:scale-90 transition-transform"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                            <div class="flex gap-1.5 flex-shrink-0">
+                                                <a :href="gmapUrl(bk.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-sky-500 active:scale-90 transition-transform" title="Google Maps"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                <a :href="naverUrl(bk.name)" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform" style="background:#03C75A" title="Naver Map"><span class="text-xs font-black">N</span></a>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
@@ -632,7 +635,10 @@
                                                                                 <div class="flex items-center gap-2 mb-1"><span class="text-[10px] px-1.5 rounded text-white font-bold" :class="idx===0?'bg-orange-400':'bg-slate-300'" x-text="idx===0?'首選':'備案'"></span><span class="font-bold text-slate-700" x-text="rest.name"></span></div>
                                                                                 <div class="text-xs text-slate-500">✨ <span x-text="rest.dish"></span></div>
                                                                             </div>
-                                                                            <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(rest.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                            <div class="flex gap-1.5 flex-shrink-0">
+                                                                                <a :href="gmapUrl(rest.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500" title="Google Maps"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                                <a :href="naverUrl(rest.name)" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background:#03C75A" title="Naver Map"><span class="text-xs font-black">N</span></a>
+                                                                            </div>
                                                                         </div>
                                                                         <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100">
                                                                             <div class="flex items-center gap-1 text-slate-600"><i class="ph-bold ph-currency-krw"></i><span x-text="rest.price||'10,000-20,000'"></span>/人</div>
@@ -650,14 +656,20 @@
                                                                 <template x-for="shop in event.shopping">
                                                                     <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center">
                                                                         <div><span class="font-bold text-slate-700" x-text="shop.name"></span><div class="text-xs text-slate-500 mt-1">🛍️ <span x-text="shop.items"></span></div></div>
-                                                                        <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(shop.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                        <div class="flex gap-1.5 flex-shrink-0">
+                                                                            <a :href="gmapUrl(shop.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500" title="Google Maps"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                            <a :href="naverUrl(shop.name)" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background:#03C75A" title="Naver Map"><span class="text-xs font-black">N</span></a>
+                                                                        </div>
                                                                     </div>
                                                                 </template>
                                                             </div>
                                                         </div>
                                                     </template>
                                                     <template x-if="!event.restaurants&&event.location">
-                                                        <a :href="'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(event.name+' '+event.location)" target="_blank" class="flex items-center justify-center gap-2 w-full bg-blue-500 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform"><i class="ph-fill ph-navigation-arrow"></i> 導航至此</a>
+                                                        <div class="flex gap-2">
+                                                            <a :href="gmapUrl(event.name+' '+event.location)" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform"><i class="ph-fill ph-navigation-arrow"></i> Google</a>
+                                                            <a :href="naverUrl(event.taxi ? event.taxi.krName : event.location)" target="_blank" class="flex-1 flex items-center justify-center gap-2 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform" style="background:#03C75A"><span class="font-black text-sm">N</span> Naver Map</a>
+                                                        </div>
                                                     </template>
                                                 </div>
                                             </div>
@@ -721,6 +733,7 @@
                 </div>
             </div>
             <button @click="speak(currentTaxi.address,'ko-KR')" class="mt-6 w-full bg-yellow-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md"><i class="ph-fill ph-speaker-high text-xl"></i> 唸出地址</button>
+            <a :href="naverUrl(currentTaxi.krName)" target="_blank" class="mt-2 w-full text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md" style="background:#03C75A"><span class="font-black">N</span> 用 Naver Map 查看位置</a>
         </div>
     </div>
 
@@ -854,7 +867,7 @@ function tripData() {
                 ]},
                 { time: '13:20', type: 'activity', name: '🌊 松亭海邊放空散步', desc: '充電休息，完全不趕，讓爸媽好好歇腳。', location: '송정해수욕장' },
                 { time: '14:20', type: 'train', name: '🚆 海岸列車 松亭→青沙浦', desc: '繼續搭海岸列車前往青沙浦。', isPass: true, detail: '🔹路線：松亭(송정) → 青沙浦(청사포)<br>🔹PASS 涵蓋' },
-                { time: '15:00', type: 'activity', name: '🌉 青沙浦散步', desc: '踏石觀景台、紅色燈塔、海岸步道。', location: '청사포 다릿돌 전망대' },
+                { time: '15:00', type: 'activity', name: '🌉 青沙浦散步', desc: '踏石觀景台、紅色燈塔、海岸步道。', location: '청사포 다릿돌 전망대', taxi: { krName: '청사포 다릿돌 전망대', address: '부산 해운대구 청사포로 167' } },
                 { time: '16:30', type: 'food', name: '☕ 青沙浦咖啡廳休息', desc: '等待膠囊列車時段，順便補充能量、看海。', location: '청사포 카페' },
                 { time: '17:30', type: 'train', name: '📸 天空膠囊列車 青沙浦→尾浦', desc: '★已訂票確認！19회차 17:30–18:00 入場，3人車＋2人車，享受夕陽海景。', location: '스카이캡슐 청사포', isConfirmed: true, mustOnTime: true, leadTime: 20, detail: '🔹路線：青沙浦(청사포) → 尾浦(미포)<br>🔹Booking No. RS26008559298<br>🔹17:30–18:00 入場，2張票（3人車＋2人車）<br>🔹自費（非 PASS 項目）<br>🔹6月底日落約 19:30，此時段光線優美' },
                 { time: '18:10', type: 'food', name: '🍽️ 晚餐：海雲台', desc: '推薦傳聞中的元祖河豚湯，或選上菜快的店，目標 19:00 前結束。', location: '해운대', restaurants: [
@@ -862,8 +875,8 @@ function tripData() {
                     { name: '해운대 돼지국밥', dish: '豬肉湯飯（最快）', price: '9,000–12,000', queue: '即入' }
                 ], tips: '目標 19:00 前結束晚餐，才能從容前往 Spa Land。' },
                 { time: '19:10', type: 'transport', name: '🚕 兩台計程車前往 Centum City', desc: '搭兩台計程車前往新世界 Centum City。', detail: '🔹海雲台 → Centum City 車程約 10 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '신세계 센텀시티 스파랜드', address: '부산 해운대구 센텀남대로 35' } },
-                { time: '19:30', type: 'activity', name: '♨️ Spa Land 汗蒸幕', desc: '使用 PASS 免費入場，可體驗至 22:00 關門，約 2.5 小時完整放鬆。', location: '스파랜드 센텀시티', isPass: true, detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹最晚入場 21:00（22:00 關門前1小時）<br>🔹19:30 入場可享完整體驗' },
-                { time: '22:00', type: 'transport', name: '🚕 搭計程車返回飯店', desc: '結束充實的一天！', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' }
+                { time: '19:30', type: 'activity', name: '♨️ Spa Land 汗蒸幕', desc: '使用 PASS 免費入場，可體驗至 22:00 關門，約 2.5 小時完整放鬆。', location: '스파랜드 센텀시티', isPass: true, taxi: { krName: '신세계 센텀시티 스파랜드', address: '부산 해운대구 센텀남대로 35' }, detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹最晚入場 21:00（22:00 關門前1小時）<br>🔹19:30 入場可享完整體驗' },
+                { time: '22:00', type: 'transport', name: '🚕 搭計程車返回飯店', desc: '結束充實的一天！', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } }
             ]
         },
         {
@@ -874,9 +887,9 @@ function tripData() {
                     { name: '본죽 本粥', dish: '多種韓式粥品', price: '8,000–14,000', queue: '即入' }
                 ]},
                 { time: '10:00', type: 'activity', name: '🏙️ BUSAN X the Sky 100樓展望台', desc: '就在海雲台，視爸媽體力決定是否前往。', location: '엑스더스카이 해운대', isPass: true, tag: '視體力', detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹含全球最高星巴克<br>🔹體力允許就去，否則直接出發松島', taxi: { krName: '엑스더스카이', address: '부산 해운대구 달맞이길 30 엘시티' } },
-                { time: '10:30', type: 'transport', name: '🚕 搭計程車跨海前往松島', desc: '行經跨海大橋，沿途景色壯觀。', detail: '🔹車程約 40–50 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '10:30', type: 'transport', name: '🚕 搭計程車跨海前往松島', desc: '行經跨海大橋，沿途景色壯觀。', detail: '🔹車程約 40–50 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '송도해상케이블카', address: '부산 서구 송도해변로 171' } },
                 { time: '11:30', type: 'activity', name: '🚡 松島海上纜車', desc: 'Songdo Bay → Sky Park，水晶車廂來回，海景震撼。', location: '송도해상케이블카', isPass: true, taxi: { krName: '송도해상케이블카', address: '부산 서구 송도해변로 171' }, detail: '🔹使用 VISIT BUSAN PASS 免費搭乘<br>🔹水晶透明車廂，建議來回各搭一趟' },
-                { time: '12:30', type: 'transport', name: '🚕 搭計程車前往札嘎其市場', desc: '從松島車程約 15 分鐘。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '12:30', type: 'transport', name: '🚕 搭計程車前往札嘎其市場', desc: '從松島車程約 15 分鐘。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '자갈치시장', address: '부산 중구 자갈치해안로 52' } },
                 { time: '13:00', type: 'food', name: '🦀 午餐：札嘎其市場海鮮大餐', desc: '一樓挑選帝王蟹、生章魚、貝類 → 二樓代客料理，靠窗海景座位。預抓 1.5–2 小時。', location: '자갈치시장', restaurants: [
                     { name: '자갈치시장 札嘎其市場', dish: '帝王蟹、生章魚、綜合貝類', price: '30,000–50,000', queue: '一樓挑選二樓料理' }
                 ], tips: '一樓買海鮮、二樓代客料理，價格透明、店家多會簡單中文。每月第一、三個週二公休（6/26 週五營業）。' },
@@ -889,14 +902,14 @@ function tripData() {
                     { name: '남포동 해산물', dish: '生魚片、海鮮料理', price: '20,000–35,000', queue: '稍候即入' },
                     { name: '남포동 한정식', dish: '韓定食套餐', price: '15,000–25,000', queue: '即入' }
                 ]},
-                { time: '20:00', type: 'transport', name: '🚕 搭計程車返回海雲台', desc: '車程約 35 分鐘，輕鬆結束今天。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' }
+                { time: '20:00', type: 'transport', name: '🚕 搭計程車返回海雲台', desc: '車程約 35 分鐘，輕鬆結束今天。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } }
             ]
         },
         {
             shortTitle: 'D4 6/27', title: 'Day 4：西面購物 + 廣安里 + 煙火遊艇', subtitle: '動線：飯店→西面→廣安里→水營灣遊艇', passDay: '',
             events: [
                 { time: '09:30', type: 'food', name: '☕ 悠閒早餐', desc: '爸媽睡飽再出發，不趕早。' },
-                { time: '10:30', type: 'transport', name: '🚕 搭計程車前往西面商圈', desc: '車程約 30 分鐘。', detail: '🔹目的地：서면 (Seomyeon)<br>🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '10:30', type: 'transport', name: '🚕 搭計程車前往西面商圈', desc: '車程約 30 分鐘。', detail: '🔹目的地：서면 (Seomyeon)<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '서면역', address: '부산 부산진구 중앙대로 지하 730' } },
                 { time: '11:00', type: 'activity', name: '🛍️ 西面商圈逛街', desc: '主攻全平路冷氣房的地下街、Olive Young。', location: '서면', shopping: [
                     { name: '서면 지하상가 西面地下街', items: '全平路冷氣，服飾、飾品、雜貨' },
                     { name: 'Olive Young 올리브영', items: 'MEDIHEAL、COSRX 美妝必掃' },
@@ -908,7 +921,7 @@ function tripData() {
                     { name: '신창돼지국밥', dish: '豬肉湯飯 + 小菜', price: '9,000–11,000', queue: '即入' }
                 ]},
                 { time: '14:00', type: 'food', name: '☕ 西面咖啡廳休息', desc: '繼續採買，或坐下來歇腳。', location: '서면 카페' },
-                { time: '15:30', type: 'transport', name: '🚕 搭計程車前往廣安里', desc: '車程約 20 分鐘。', detail: '🔹目的地：광안리해수욕장<br>🔹⚠ 下車前記得索取收據（영수증 주세요）' },
+                { time: '15:30', type: 'transport', name: '🚕 搭計程車前往廣安里', desc: '車程約 20 分鐘。', detail: '🔹目的地：광안리해수욕장<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '광안리해수욕장', address: '부산 수영구 광안해변로 219' } },
                 { time: '16:00', type: 'activity', name: '🌊 廣安里海灘夕陽散步', desc: '找間海景咖啡廳悠閒看廣安大橋，6月底日落約 19:30。', location: '광안리 해수욕장', tips: '6月氣溫高，帶防曬、墨鏡。沙灘旁咖啡廳找面海二樓座位最佳。' },
                 { time: '18:30', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '充裕用餐，21:30 遊艇前有足夠時間。', location: '광안리', restaurants: [
                     { name: '광안리 소갈비 牛排骨', dish: '韓式牛排骨', price: '35,000–55,000', queue: '建議預約' },
@@ -917,7 +930,7 @@ function tripData() {
                 { time: '20:40', type: 'transport', name: '🚕 計程車前往水營灣遊艇競技場', desc: '從廣安里過去車程約 10–15 分鐘。', detail: '🔹目的地：수영만요트경기장 (水營灣遊艇競技場)<br>🔹注意：上船點在此，非廣安里海灘正面<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '수영만요트경기장', address: '부산 해운대구 우동 1393' } },
                 { time: '21:00', type: 'activity', name: '🚶 抵達碼頭等候報到', desc: '提早抵達辦理報到手續。', location: '수영만요트경기장' },
                 { time: '21:30', type: 'activity', name: '🎆 廣安里煙火遊艇', desc: '★已預約確認（Klook 自購）！海上近距離觀賞廣安大橋夜景與煙火。', location: '광안리 유람선', isConfirmed: true, mustOnTime: true, leadTime: 30, detail: '🔹Klook 購票，非 PASS 項目<br>🔹從水營灣遊艇競技場出發<br>🔹海上觀賞廣安大橋夜景與煙火，約 60 分鐘' },
-                { time: '22:45', type: 'transport', name: '🚕 搭計程車返回海雲台', desc: '車程約 20 分鐘，結束釜山最精彩的夜晚。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）' }
+                { time: '22:45', type: 'transport', name: '🚕 搭計程車返回海雲台', desc: '車程約 20 分鐘，結束釜山最精彩的夜晚。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } }
             ]
         },
         {
@@ -934,7 +947,7 @@ function tripData() {
                     { name: '동태찌개 大鱈魚湯', dish: '辣鱈魚湯', price: '10,000–15,000', queue: '即入' },
                     { name: '교촌치킨 橋村炸雞', dish: '韓式炸雞', price: '18,000–25,000', queue: '即入' }
                 ]},
-                { time: '15:00', type: 'transport', name: '🧳 取行李 → 包車前往金海機場', desc: '搭乘預約包車直達金海機場，避開傍晚通勤車潮。', detail: '🔹包車：KKday / Klook 商務9人車<br>🔹車程約 35–45 分鐘<br>🔹出發前再次確認機票、護照' },
+                { time: '15:00', type: 'transport', name: '🧳 取行李 → 包車前往金海機場', desc: '搭乘預約包車直達金海機場，避開傍晚通勤車潮。', detail: '🔹包車：KKday / Klook 商務9人車<br>🔹車程約 35–45 分鐘<br>🔹出發前再次確認機票、護照', taxi: { krName: '김해국제공항', address: '부산 강서구 공항진입로 108' } },
                 { time: '18:55', type: 'flight', name: '✈️ 搭機回台北（JX903）', desc: '結束美好的釜山五日遊，帶著滿滿回憶和戰利品回家！', location: '김해국제공항 Gimhae Airport', tips: '建議提前 2.5–3 小時抵達機場辦理報到。金海機場免稅店可補購最後伴手禮。' }
             ]
         }
@@ -1030,7 +1043,7 @@ function tripData() {
         nextEvent: null, showNextBar: true,
         fxRate: parseFloat(localStorage.getItem('busan_fx_rate')) || 0.023,
         fxKrw: null, fxNtd: null, fxFrom: 'krw',
-        statusMsg: 'v6 • 2026 韓國釜山 • Made with ❤️',
+        statusMsg: 'v7 • 2026 韓國釜山 • Made with ❤️',
 
         phrases: {
             food: [
@@ -1530,7 +1543,11 @@ ${ticketInfo}
 
         getIconColor(t) { const c={transport:'bg-blue-500',food:'bg-orange-400',activity:'bg-slate-700',hotel:'bg-indigo-500',flight:'bg-sky-500',train:'bg-teal-500'}; return c[t]||'bg-slate-400'; },
         getIconClass(t) { const i={transport:'ph-bold ph-taxi',food:'ph-bold ph-bowl-food',activity:'ph-bold ph-camera',hotel:'ph-bold ph-bed',flight:'ph-bold ph-airplane-tilt',train:'ph-bold ph-train'}; return i[t]||'ph-circle'; },
-        getTagColor(t) { if(t==='需預約')return'bg-red-100 text-red-600'; if(t==='必吃')return'bg-orange-100 text-orange-600'; if(t==='視體力')return'bg-purple-100 text-purple-600'; return'bg-blue-100 text-blue-600'; }
+        getTagColor(t) { if(t==='需預約')return'bg-red-100 text-red-600'; if(t==='必吃')return'bg-orange-100 text-orange-600'; if(t==='視體力')return'bg-purple-100 text-purple-600'; return'bg-blue-100 text-blue-600'; },
+
+        // 導航連結輔助：Naver 優先用韓文關鍵字（命中率高），Google 為後援
+        naverUrl(query) { return 'https://map.naver.com/p/search/' + encodeURIComponent(query); },
+        gmapUrl(query) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query); }
     };
 }
 </script>
