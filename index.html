@@ -636,8 +636,8 @@
                                                                                 <div class="text-xs text-slate-500">✨ <span x-text="rest.dish"></span></div>
                                                                             </div>
                                                                             <div class="flex gap-1.5 flex-shrink-0">
-                                                                                <a :href="gmapUrl(rest.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500" title="Google Maps"><i class="ph-fill ph-navigation-arrow"></i></a>
-                                                                                <a :href="naverUrl(rest.name)" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background:#03C75A" title="Naver Map"><span class="text-xs font-black">N</span></a>
+                                                                                <a :href="gmapLink(rest, rest.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500" title="Google Maps"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                                <a :href="naverLink(rest, rest.name)" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background:#03C75A" title="Naver Map"><span class="text-xs font-black">N</span></a>
                                                                             </div>
                                                                         </div>
                                                                         <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100">
@@ -657,8 +657,8 @@
                                                                     <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center">
                                                                         <div><span class="font-bold text-slate-700" x-text="shop.name"></span><div class="text-xs text-slate-500 mt-1">🛍️ <span x-text="shop.items"></span></div></div>
                                                                         <div class="flex gap-1.5 flex-shrink-0">
-                                                                            <a :href="gmapUrl(shop.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500" title="Google Maps"><i class="ph-fill ph-navigation-arrow"></i></a>
-                                                                            <a :href="naverUrl(shop.name)" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background:#03C75A" title="Naver Map"><span class="text-xs font-black">N</span></a>
+                                                                            <a :href="gmapLink(shop, shop.name+' Busan')" target="_blank" class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500" title="Google Maps"><i class="ph-fill ph-navigation-arrow"></i></a>
+                                                                            <a :href="naverLink(shop, shop.name)" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background:#03C75A" title="Naver Map"><span class="text-xs font-black">N</span></a>
                                                                         </div>
                                                                     </div>
                                                                 </template>
@@ -667,8 +667,8 @@
                                                     </template>
                                                     <template x-if="!event.restaurants&&event.location">
                                                         <div class="flex gap-2">
-                                                            <a :href="gmapUrl(event.name+' '+event.location)" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform"><i class="ph-fill ph-navigation-arrow"></i> Google</a>
-                                                            <a :href="naverUrl(event.taxi ? event.taxi.krName : event.location)" target="_blank" class="flex-1 flex items-center justify-center gap-2 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform" style="background:#03C75A"><span class="font-black text-sm">N</span> Naver Map</a>
+                                                            <a :href="gmapLink(event, event.name+' '+event.location)" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform"><i class="ph-fill ph-navigation-arrow"></i> Google</a>
+                                                            <a :href="naverLink(event, event.taxi ? event.taxi.krName : event.location)" target="_blank" class="flex-1 flex items-center justify-center gap-2 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform" style="background:#03C75A"><span class="font-black text-sm">N</span> Naver Map</a>
                                                         </div>
                                                     </template>
                                                 </div>
@@ -843,14 +843,14 @@ function tripData() {
             events: [
                 { time: '11:00', type: 'flight', name: '🛬 抵達金海機場', desc: 'JX900 落地，通關＋提行李約 45–60 分鐘。', location: '김해국제공항 Gimhae Airport', detail: '🔹包車：KKday / Klook 商務9人車<br>🔹5人加5件大行李一車直達<br>🔹通關＋提行李預抓 45–60 分鐘' },
                 { time: '12:00', type: 'transport', name: '🚗 包車前往 Shilla Stay 海雲台', desc: '搭乘預約包車直達飯店。', detail: '🔹車程約 35–45 分鐘<br>🔹預計 13:00 前抵達飯店' },
-                { time: '13:00', type: 'hotel', name: '🏨 飯店寄放行李', desc: 'Check-in 通常 15:00，先寄放行李輕裝出發。', location: '신라스테이 해운대', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } },
-                { time: '13:15', type: 'food', name: '🍽️ 午餐：海雲台周邊', desc: '推薦豬肉湯飯或海鮮料理，快速填飽肚子。', location: '해운대', restaurants: [
-                    { name: '해운대 돼지국밥', dish: '豬肉湯飯', price: '9,000–12,000', queue: '即入' },
-                    { name: '해운대 해물탕', dish: '海鮮鍋', price: '15,000–25,000', queue: '即入' }
+                { time: '13:00', type: 'hotel', name: '🏨 飯店寄放行李', desc: 'Check-in 通常 15:00，先寄放行李輕裝出發。', location: '신라스테이 해운대', naver: 'https://naver.me/F0z2mzjC', gmap: '신라스테이 해운대 Shilla Stay Haeundae', taxi: { krName: '신라스테이 해운대', address: '부산 해운대구 해운대해변로 292' } },
+                { time: '13:15', type: 'food', name: '🍽️ 午餐：海雲台周邊', desc: '推薦富多麵屋或海鮮刀削麵，快速填飽肚子。', location: '해운대', restaurants: [
+                    { name: '富多麵屋', dish: '韓式麵食', price: '9,000–15,000', queue: '即入', naver: 'https://naver.me/5eUcGq3x', gmap: '부다면옥 해운대' },
+                    { name: '海雲台31cm海鮮刀削麵', dish: '海鮮刀削麵', price: '10,000–15,000', queue: '稍候即入', naver: 'https://naver.me/5XJI630U', gmap: '해운대 31cm 해물칼국수' }
                 ]},
                 { time: '15:00', type: 'hotel', name: '🏨 飯店 Check-in', desc: '正式進房，稍作休息。' },
-                { time: '15:30', type: 'activity', name: '🌊 海雲台沙灘 + 冬柏島步道', desc: '飯店下樓即達，沿木棧道散步，全平路，爸媽友善。', location: '해운대 동백섬', tips: '全程步行無需叫車，6月天氣炎熱記得帶水、防曬。' },
-                { time: '18:00', type: 'food', name: '🍖 晚餐：Ribs of Legend 海雲台', desc: '★已預約 18:00！準時抵達享用招牌排骨大餐。', location: 'Ribs of Legend Haeundae', isConfirmed: true, mustOnTime: true, leadTime: 15, taxi: { krName: 'Ribs of Legend 해운대', address: '부산 해운대구 (預約時確認店址)' }, tips: '已預約 18:00，建議 17:45 前抵達。若從 The Bay 反過來安排亦可，依現場狀況彈性調整。' },
+                { time: '15:30', type: 'activity', name: '🌊 海雲台沙灘 + 冬柏島步道', desc: '飯店下樓即達，沿木棧道散步，全平路，爸媽友善。', location: '해운대 동백섬', naver: 'https://naver.me/Fio7CdsF', gmap: '동백섬 해운대 Dongbaekseom', tips: '全程步行無需叫車，6月天氣炎熱記得帶水、防曬。' },
+                { time: '18:00', type: 'food', name: '🍖 晚餐：Ribs of Legend 海雲台', desc: '★已預約 18:00！準時抵達享用招牌排骨大餐。', location: 'Ribs of Legend Haeundae', naver: 'https://naver.me/FG7xlkHZ', gmap: 'Ribs of Legend Haeundae', isConfirmed: true, mustOnTime: true, leadTime: 15, taxi: { krName: 'Ribs of Legend 해운대', address: '부산 해운대구 (預約時確認店址)' }, tips: '已預約 18:00，建議 17:45 前抵達。若從 The Bay 反過來安排亦可，依現場狀況彈性調整。' },
                 { time: '20:00', type: 'activity', name: '🌅 The Bay 101 夜景', desc: '吃飽後散步過去，欣賞天黑後最經典的摩天大樓水中倒影。', location: '더베이101 해운대', detail: '🔹晚餐後步行前往<br>🔹天黑後燈光倒影最美，拍照打卡熱點' }
             ]
         },
@@ -858,20 +858,23 @@ function tripData() {
             shortTitle: 'D2 6/25', title: 'Day 2：海景列車 + 滑車 + 膠囊 + 水療', subtitle: '動線：尾浦→松亭→青沙浦→尾浦（膠囊）→Spa Land', passDay: 'PASS 09:30 啟用',
             events: [
                 { time: '08:30', type: 'food', name: '☕ 飯店周邊早餐', desc: 'Isaac Toast 或咖啡外帶，建議邊走邊吃較從容。', detail: '🔹建議外帶邊走邊吃<br>🔹或提早至 08:15 出門購買，時間更充裕' },
-                { time: '09:10', type: 'transport', name: '🚶 步行前往尾浦站（Mipo）', desc: '從飯店步行約 10–15 分鐘。', location: 'Haeundae Blueline Park Mipo Station' },
+                { time: '09:10', type: 'transport', name: '🚕 搭計程車前往尾浦站（Mipo）', desc: '步行約 24 分鐘較遠，改搭計程車約 5–8 分鐘。', location: 'Haeundae Blueline Park Mipo Station', naver: 'https://naver.me/FafyrnAe', gmap: '미포 해운대 블루라인파크 Mipo Station', taxi: { krName: '해운대 블루라인파크 미포정거장', address: '부산 해운대구 달맞이길62번길 13' }, detail: '🔹從飯店搭計程車約 5–8 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）' },
                 { time: '09:30', type: 'train', name: '🚆 海岸列車 尾浦→松亭', desc: '★刷 VISIT BUSAN PASS 正式啟用 48H！', isPass: true, detail: '🔹路線：尾浦(미포) → 松亭(송정)<br>🔹★PASS 啟用點：48H 從此刻起算<br>🔹覆蓋至 DAY4 09:30' },
                 { time: '10:10', type: 'activity', name: '🛷 Skyline Luge 釜山斜坡滑車', desc: '纜車＋Luge 2–3 趟，約 2 小時。不玩的爸媽可在景觀咖啡廳休息。', location: '스카이라인 루지 부산', isPass: true, taxi: { krName: '스카이라인 루지 부산', address: '부산 기장군 기장읍 기장해안로 205' }, tips: 'Luge 旺季排隊較長，若延遲可彈性壓縮後面松亭海邊時間，不影響 17:30 膠囊列車。' },
-                { time: '12:20', type: 'food', name: '🍽️ 午餐：松亭', desc: '推薦豬肉湯飯（最穩）或海鮮湯麵。', location: '송정', restaurants: [
-                    { name: '송정 돼지국밥', dish: '豬肉湯飯', price: '9,000–12,000', queue: '即入' },
-                    { name: '송정 해물칼국수', dish: '海鮮刀切麵', price: '10,000–15,000', queue: '即入' }
+                { time: '12:20', type: 'food', name: '🍽️ 午餐：松亭', desc: '推薦松亭海帶湯飯或海鮮刀削麵。', location: '송정', restaurants: [
+                    { name: '松亭海帶湯飯', dish: '海帶湯飯 미역국밥', price: '9,000–12,000', queue: '即入', naver: 'https://naver.me/5BcjTDSJ', gmap: '송정 미역국밥' },
+                    { name: '海雲台31cm海鮮刀削麵', dish: '海鮮刀削麵', price: '10,000–15,000', queue: '稍候即入', naver: 'https://naver.me/Gsj2g76E', gmap: '해운대 31cm 해물칼국수' }
                 ]},
                 { time: '13:20', type: 'activity', name: '🌊 松亭海邊放空散步', desc: '充電休息，完全不趕，讓爸媽好好歇腳。', location: '송정해수욕장' },
                 { time: '14:20', type: 'train', name: '🚆 海岸列車 松亭→青沙浦', desc: '繼續搭海岸列車前往青沙浦。', isPass: true, detail: '🔹路線：松亭(송정) → 青沙浦(청사포)<br>🔹PASS 涵蓋' },
                 { time: '15:00', type: 'activity', name: '🌉 青沙浦散步', desc: '踏石觀景台、紅色燈塔、海岸步道。', location: '청사포 다릿돌 전망대', taxi: { krName: '청사포 다릿돌 전망대', address: '부산 해운대구 청사포로 167' } },
-                { time: '16:30', type: 'food', name: '☕ 青沙浦咖啡廳休息', desc: '等待膠囊列車時段，順便補充能量、看海。', location: '청사포 카페' },
+                { time: '16:30', type: 'food', name: '☕ 青沙浦咖啡廳休息', desc: '等待膠囊列車時段，順便補充能量、看海。推薦 Ribereuta 或 Beuroni。', location: '청사포 카페', restaurants: [
+                    { name: 'Ribereuta 青沙浦店', dish: '海景咖啡廳', price: '6,000–12,000', queue: '看海首選', naver: 'https://naver.me/FIfsazLx', gmap: 'Ribereuta 청사포' },
+                    { name: 'Beuroni 브로니', dish: '咖啡甜點', price: '6,000–12,000', queue: '氣氛佳', naver: 'https://naver.me/xprAn4op', gmap: 'Beuroni 브로니 청사포' }
+                ]},
                 { time: '17:30', type: 'train', name: '📸 天空膠囊列車 青沙浦→尾浦', desc: '★已訂票確認！19회차 17:30–18:00 入場，3人車＋2人車，享受夕陽海景。', location: '스카이캡슐 청사포', isConfirmed: true, mustOnTime: true, leadTime: 20, detail: '🔹路線：青沙浦(청사포) → 尾浦(미포)<br>🔹Booking No. RS26008559298<br>🔹17:30–18:00 入場，2張票（3人車＋2人車）<br>🔹自費（非 PASS 項目）<br>🔹6月底日落約 19:30，此時段光線優美' },
                 { time: '18:10', type: 'food', name: '🍽️ 晚餐：海雲台', desc: '推薦傳聞中的元祖河豚湯，或選上菜快的店，目標 19:00 前結束。', location: '해운대', restaurants: [
-                    { name: '원조 복국 元祖河豚湯', dish: '河豚湯 복국', price: '12,000–20,000', queue: '即入' },
+                    { name: '元祖河豚湯 원조 복국', dish: '河豚湯 복국', price: '12,000–20,000', queue: '即入', naver: 'https://naver.me/xLWAEDrZ', gmap: '원조 할매 복국 해운대' },
                     { name: '해운대 돼지국밥', dish: '豬肉湯飯（最快）', price: '9,000–12,000', queue: '即入' }
                 ], tips: '目標 19:00 前結束晚餐，才能從容前往 Spa Land。' },
                 { time: '19:10', type: 'transport', name: '🚕 兩台計程車前往 Centum City', desc: '搭兩台計程車前往新世界 Centum City。', detail: '🔹海雲台 → Centum City 車程約 10 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '신세계 센텀시티 스파랜드', address: '부산 해운대구 센텀남대로 35' } },
@@ -882,19 +885,19 @@ function tripData() {
         {
             shortTitle: 'D3 6/26', title: 'Day 3：百樓展望 + 松島 + 南浦洞', subtitle: '動線：飯店→松島→札嘎其→南浦洞→飯店', passDay: 'PASS DAY 2',
             events: [
-                { time: '09:00', type: 'food', name: '🥣 早餐：鮑魚粥', desc: '推薦濟州家或本粥，健康暖胃。', location: '죽집 해운대', restaurants: [
-                    { name: '제주家 濟州家', dish: '鮑魚粥 전복죽', price: '12,000–15,000', queue: '即入' },
-                    { name: '본죽 本粥', dish: '多種韓式粥品', price: '8,000–14,000', queue: '即入' }
+                { time: '09:00', type: 'food', name: '🥣 早餐：豬肉湯飯 / 粥', desc: '推薦密陽血腸豬肉湯飯或本粥，健康暖胃。', location: '해운대', restaurants: [
+                    { name: '密陽血腸豬肉湯飯', dish: '血腸豬肉湯飯 순대돼지국밥', price: '9,000–12,000', queue: '即入', naver: 'https://naver.me/5T4ABsWP', gmap: '밀양순대돼지국밥 해운대' },
+                    { name: '本粥 海雲台店', dish: '鮑魚粥等多種粥品', price: '8,000–14,000', queue: '即入', naver: 'https://naver.me/xprfOotp', gmap: '본죽 해운대' }
                 ]},
                 { time: '10:00', type: 'activity', name: '🏙️ BUSAN X the Sky 100樓展望台', desc: '就在海雲台，視爸媽體力決定是否前往。', location: '엑스더스카이 해운대', isPass: true, tag: '視體力', detail: '🔹使用 VISIT BUSAN PASS 免費入場<br>🔹含全球最高星巴克<br>🔹體力允許就去，否則直接出發松島', taxi: { krName: '엑스더스카이', address: '부산 해운대구 달맞이길 30 엘시티' } },
                 { time: '10:30', type: 'transport', name: '🚕 搭計程車跨海前往松島', desc: '行經跨海大橋，沿途景色壯觀。', detail: '🔹車程約 40–50 分鐘<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '송도해상케이블카', address: '부산 서구 송도해변로 171' } },
                 { time: '11:30', type: 'activity', name: '🚡 松島海上纜車', desc: 'Songdo Bay → Sky Park，水晶車廂來回，海景震撼。', location: '송도해상케이블카', isPass: true, taxi: { krName: '송도해상케이블카', address: '부산 서구 송도해변로 171' }, detail: '🔹使用 VISIT BUSAN PASS 免費搭乘<br>🔹水晶透明車廂，建議來回各搭一趟' },
                 { time: '12:30', type: 'transport', name: '🚕 搭計程車前往札嘎其市場', desc: '從松島車程約 15 分鐘。', detail: '🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '자갈치시장', address: '부산 중구 자갈치해안로 52' } },
                 { time: '13:00', type: 'food', name: '🦀 午餐：札嘎其市場海鮮大餐', desc: '一樓挑選帝王蟹、生章魚、貝類 → 二樓代客料理，靠窗海景座位。預抓 1.5–2 小時。', location: '자갈치시장', restaurants: [
-                    { name: '자갈치시장 札嘎其市場', dish: '帝王蟹、生章魚、綜合貝類', price: '30,000–50,000', queue: '一樓挑選二樓料理' }
+                    { name: '자갈치시장 札嘎其市場', dish: '帝王蟹、生章魚、綜合貝類', price: '30,000–50,000', queue: '一樓挑選二樓料理', naver: 'https://naver.me/xBwJzsdQ', gmap: '자갈치시장 Jagalchi Market' }
                 ], tips: '一樓買海鮮、二樓代客料理，價格透明、店家多會簡單中文。每月第一、三個週二公休（6/26 週五營業）。' },
                 { time: '15:00', type: 'activity', name: '🛍️ 南浦洞市區悠閒逛街', desc: 'BIFF廣場、國際市場、富平罐頭市場，步行即達，無時間壓力。', location: '남포동', shopping: [
-                    { name: 'BIFF 廣場', items: '街頭小吃，黑糖餅必吃' },
+                    { name: 'BIFF 廣場', items: '街頭小吃，黑糖餅必吃', naver: 'https://naver.me/FDnCfOLW', gmap: 'BIFF 광장 부산' },
                     { name: '국제시장 國際市場', items: '生活雜貨、紀念品、伴手禮' },
                     { name: '부평깡통시장 富平罐頭市場', items: '傳統市場美食' }
                 ]},
@@ -909,7 +912,7 @@ function tripData() {
             shortTitle: 'D4 6/27', title: 'Day 4：西面購物 + 廣安里 + 煙火遊艇', subtitle: '動線：飯店→西面→廣安里→水營灣遊艇', passDay: '',
             events: [
                 { time: '09:30', type: 'food', name: '☕ 悠閒早餐', desc: '爸媽睡飽再出發，不趕早。' },
-                { time: '10:30', type: 'transport', name: '🚕 搭計程車前往西面商圈', desc: '車程約 30 分鐘。', detail: '🔹目的地：서면 (Seomyeon)<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '서면역', address: '부산 부산진구 중앙대로 지하 730' } },
+                { time: '10:30', type: 'transport', name: '🚕 搭計程車前往西面（樂天百貨）', desc: '車程約 30 分鐘，目的地設樂天百貨西面店較明確。', location: '서면 롯데백화점', naver: 'https://naver.me/xZVbDc9R', gmap: '롯데백화점 부산본점 서면', detail: '🔹目的地：樂天百貨 西面店（롯데백화점 부산본점）<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '롯데백화점 부산본점', address: '부산 부산진구 가야대로 772' } },
                 { time: '11:00', type: 'activity', name: '🛍️ 西面商圈逛街', desc: '主攻全平路冷氣房的地下街、Olive Young。', location: '서면', shopping: [
                     { name: '서면 지하상가 西面地下街', items: '全平路冷氣，服飾、飾品、雜貨' },
                     { name: 'Olive Young 올리브영', items: 'MEDIHEAL、COSRX 美妝必掃' },
@@ -917,14 +920,17 @@ function tripData() {
                     { name: '롯데백화점 樂天百貨', items: '爸媽可在一樓咖啡廳休息' }
                 ]},
                 { time: '13:00', type: 'food', name: '🍖 午餐：松亭3代豬肉湯飯', desc: '釜山必吃代表美食。', location: '서면 돼지국밥', restaurants: [
-                    { name: '송정3대국밥 松亭3代豬肉湯飯', dish: '돼지국밥 豬肉湯飯', price: '9,000–12,000', queue: '中午稍候' },
+                    { name: '松亭3代豬肉湯飯', dish: '돼지국밥 豬肉湯飯', price: '9,000–12,000', queue: '中午稍候', naver: 'https://naver.me/GfCsEbvp', gmap: '송정3대국밥 서면' },
                     { name: '신창돼지국밥', dish: '豬肉湯飯 + 小菜', price: '9,000–11,000', queue: '即入' }
                 ]},
-                { time: '14:00', type: 'food', name: '☕ 西面咖啡廳休息', desc: '繼續採買，或坐下來歇腳。', location: '서면 카페' },
-                { time: '15:30', type: 'transport', name: '🚕 搭計程車前往廣安里', desc: '車程約 20 分鐘。', detail: '🔹目的地：광안리해수욕장<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '광안리해수욕장', address: '부산 수영구 광안해변로 219' } },
+                { time: '14:00', type: 'food', name: '☕ 西面咖啡廳休息', desc: '繼續採買，或坐下來歇腳。推薦 LASOOP 或 pat of 釜山。', location: '서면 카페', restaurants: [
+                    { name: 'LASOOP 라숲', dish: '三層樓大自然系咖啡廳', price: '7,000–13,000', queue: '人氣打卡', naver: 'https://naver.me/517ncNSe', gmap: 'LASOOP 라숲 부산' },
+                    { name: 'pat of 釜山', dish: '老宅咖啡廳', price: '7,000–13,000', queue: '氣氛佳', naver: 'https://naver.me/5EUZg4cH', gmap: 'pat of 부산' }
+                ]},
+                { time: '15:30', type: 'transport', name: '🚕 搭計程車前往廣安里海水浴場入口', desc: '車程約 20 分鐘，目的地設海水浴場入口較明確。', location: '광안리해수욕장', naver: 'https://naver.me/5gFLfUP0', gmap: '광안리해수욕장 입구 Gwangalli Beach', detail: '🔹目的地：廣安里海水浴場入口<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '광안리해수욕장', address: '부산 수영구 광안해변로 219' } },
                 { time: '16:00', type: 'activity', name: '🌊 廣安里海灘夕陽散步', desc: '找間海景咖啡廳悠閒看廣安大橋，6月底日落約 19:30。', location: '광안리 해수욕장', tips: '6月氣溫高，帶防曬、墨鏡。沙灘旁咖啡廳找面海二樓座位最佳。' },
-                { time: '18:30', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '充裕用餐，21:30 遊艇前有足夠時間。', location: '광안리', restaurants: [
-                    { name: '광안리 소갈비 牛排骨', dish: '韓式牛排骨', price: '35,000–55,000', queue: '建議預約' },
+                { time: '18:30', type: 'food', name: '🍽️ 晚餐：廣安里海景餐廳', desc: '充裕用餐，21:30 遊艇前有足夠時間。首選 Nasari 食堂海景餐廳。', location: '광안리', restaurants: [
+                    { name: 'Nasari 食堂（海景）', dish: '海景韓式料理', price: '20,000–35,000', queue: '海景首選', naver: 'https://naver.me/GV2tQAcZ', gmap: 'Nasari 나사리식당 광안리' },
                     { name: '광안리 삼겹살', dish: '烤豬五花', price: '15,000–25,000', queue: '即入' }
                 ]},
                 { time: '20:40', type: 'transport', name: '🚕 計程車前往水營灣遊艇競技場', desc: '從廣安里過去車程約 10–15 分鐘。', detail: '🔹目的地：수영만요트경기장 (水營灣遊艇競技場)<br>🔹注意：上船點在此，非廣安里海灘正面<br>🔹⚠ 下車前記得索取收據（영수증 주세요）', taxi: { krName: '수영만요트경기장', address: '부산 해운대구 우동 1393' } },
@@ -938,8 +944,8 @@ function tripData() {
             events: [
                 { time: '09:30', type: 'food', name: '☕ 慢活早餐', desc: '最後一天，悠閒享用早餐。' },
                 { time: '10:30', type: 'activity', name: '🛍️ 海雲台主街最後採買', desc: 'Olive Young、大創補貨，買完回飯店直接塞進行李箱。', location: '해운대 올리브영', shopping: [
-                    { name: 'Olive Young 海雲台店', items: 'MEDIHEAL 面膜、COSRX、氣墊粉底' },
-                    { name: 'Daiso 다이소 大創', items: '韓國限定款、收納小物' },
+                    { name: 'Olive Young 海雲台店', items: 'MEDIHEAL 面膜、COSRX、氣墊粉底', naver: 'https://naver.me/x9BYjf19', gmap: '올리브영 해운대' },
+                    { name: 'Daiso 다이소 大創', items: '韓國限定款、收納小物', naver: 'https://naver.me/F5DoD8rA', gmap: '다이소 해운대' },
                     { name: '해운대시장 伴手禮', items: '海苔禮盒、韓國零食' }
                 ]},
                 { time: '12:00', type: 'hotel', name: '🏨 辦理 Check-out + 寄放行李', desc: '退房，行李寄放飯店櫃檯。' },
@@ -1043,7 +1049,7 @@ function tripData() {
         nextEvent: null, showNextBar: true,
         fxRate: parseFloat(localStorage.getItem('busan_fx_rate')) || 0.023,
         fxKrw: null, fxNtd: null, fxFrom: 'krw',
-        statusMsg: 'v7 • 2026 韓國釜山 • Made with ❤️',
+        statusMsg: 'v8 • 2026 韓國釜山 • Made with ❤️',
 
         phrases: {
             food: [
@@ -1546,8 +1552,11 @@ ${ticketInfo}
         getTagColor(t) { if(t==='需預約')return'bg-red-100 text-red-600'; if(t==='必吃')return'bg-orange-100 text-orange-600'; if(t==='視體力')return'bg-purple-100 text-purple-600'; return'bg-blue-100 text-blue-600'; },
 
         // 導航連結輔助：Naver 優先用韓文關鍵字（命中率高），Google 為後援
+        // 導航連結：item.naver / item.gmap 為指定連結（優先），否則用關鍵字搜尋
         naverUrl(query) { return 'https://map.naver.com/p/search/' + encodeURIComponent(query); },
-        gmapUrl(query) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query); }
+        gmapUrl(query) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query); },
+        naverLink(item, fallbackQuery) { return (item && item.naver) ? item.naver : this.naverUrl(fallbackQuery); },
+        gmapLink(item, fallbackQuery) { return (item && item.gmap) ? this.gmapUrl(item.gmap) : this.gmapUrl(fallbackQuery); }
     };
 }
 </script>
